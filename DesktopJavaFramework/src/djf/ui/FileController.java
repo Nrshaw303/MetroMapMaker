@@ -145,29 +145,36 @@ public class FileController {
     }
 
     public void processExportRequest() {
-        PropertiesManager props = PropertiesManager.getPropertiesManager();
-        try {
-            // MAYBE WE ALREADY KNOW THE FILE
-            if (currentWorkFile != null) {
-                saveWork(currentWorkFile);
-            }
-            // OTHERWISE WE NEED TO PROMPT THE USER
-            else {
-                // PROMPT THE USER FOR A FILE NAME
-                FileChooser fc = new FileChooser();
-                fc.setInitialDirectory(new File(PATH_WORK));
-                fc.setTitle(props.getProperty(SAVE_WORK_TITLE));
-                fc.getExtensionFilters().addAll(
-                        new FileChooser.ExtensionFilter(props.getProperty(WORK_FILE_EXT_DESC),
-                                                               props.getProperty(WORK_FILE_EXT)));
-
-                File selectedFile = fc.showSaveDialog(app.getGUI().getWindow());
-                if (selectedFile != null) {
-                    saveWork(selectedFile);
-                }
-            }
-        } catch (IOException ioe) {
-            AppDialogs.showMessageDialog(app.getGUI().getWindow(), SAVE_ERROR_TITLE, SAVE_ERROR_CONTENT);
+//        PropertiesManager props = PropertiesManager.getPropertiesManager();
+//        try {
+//            // MAYBE WE ALREADY KNOW THE FILE
+//            if (currentWorkFile != null) {
+//                saveWork(currentWorkFile);
+//            }
+//            // OTHERWISE WE NEED TO PROMPT THE USER
+//            else {
+//                // PROMPT THE USER FOR A FILE NAME
+//                FileChooser fc = new FileChooser();
+//                fc.setInitialDirectory(new File(PATH_WORK));
+//                fc.setTitle(props.getProperty(SAVE_WORK_TITLE));
+//                fc.getExtensionFilters().addAll(
+//                        new FileChooser.ExtensionFilter(props.getProperty(WORK_FILE_EXT_DESC),
+//                                                               props.getProperty(WORK_FILE_EXT)));
+//
+//                File selectedFile = fc.showSaveDialog(app.getGUI().getWindow());
+//                if (selectedFile != null) {
+//                    saveWork(selectedFile);
+//                }
+//            }
+//        } catch (IOException ioe) {
+//            AppDialogs.showMessageDialog(app.getGUI().getWindow(), SAVE_ERROR_TITLE, SAVE_ERROR_CONTENT);
+//        }
+        ButtonType sellection = AppDialogs.showYesNoCancelDialog(app.getGUI().getWindow(), EXPORT_WORK_TITLE, EXPORT_WORK_CONTENT);
+        if (sellection == ButtonType.YES){
+            AppDialogs.showMessageDialog(app.getGUI().getWindow(), EXPORT_SUCCESS_TITLE, EXPORT_SUCCESS_CONTENT);
+        }
+        else if (sellection == ButtonType.NO){
+            AppDialogs.showMessageDialog(app.getGUI().getWindow(), EXPORT_FAILURE_TITLE, EXPORT_FAILURE_CONTENT);
         }
     }
 
