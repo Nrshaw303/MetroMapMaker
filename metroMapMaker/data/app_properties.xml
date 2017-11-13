@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This XML file allows us to easily customize the look and language used
+    in our program's user interface. Note that this properties file is only
+    for the standard controls for an app from the Desktop Java Framework, so
+    it would not include things initialized for the workspace, which is
+    customizable.
+-->
+<properties>
+    <property_list>
+        <!-- DESKTOP JAVA FRAMEWORK CONTROLS SETTINGS -->
+        <property name="APP_TITLE" value="Metro Map Maker"/>
+        <property name="APP_LOGO" value="MMMIcon.png"/>
+        <property name="APP_PATH_CSS" value="css/"/>
+        <property name="APP_CSS" value="map_style.css"/>
+        <property name="PREF_WIDTH" value="800"/>
+        <property name="PREF_HEIGHT" value="600"/>
+        <property name="START_MAXIMIZED" value="true"/>
+        <property name="CLOSE_BUTTON_TEXT" value="X"/>
+
+        <!-- TOP TOOLBARS AND CONTROLS TO INCLUDE -->
+        <property name="HAS_TOP_TOOLBAR" value="true"/>
+        <property name="HAS_FILE_TOOLBAR" value="true"/>
+        <property name="HAS_NEW" value="true"/>
+        <property name="HAS_LOAD" value="true"/>
+        <property name="HAS_CLOSE" value="false"/>
+        <property name="HAS_SAVE" value="true"/>
+        <property name="HAS_SAVE_AS" value="true"/>
+        <property name="HAS_EXPORT" value="true"/>
+        <property name="HAS_EXIT" value="true"/>
+        <property name="HAS_CUT_TOOLBAR" value="false"/>
+        <property name="HAS_UNDO_TOOLBAR" value="true"/>
+        <property name="HAS_SETTINGS_TOOLBAR" value="true"/>
+        <property name="HAS_LANGUAGE" value="false"/>
+        <property name="HAS_HELP" value="false"/>
+        <property name="HAS_ABOUT" value="true"/>
+
+        <!-- PROGRAM ICON FILES - FILE TOOLBAR -->
+        <property name="NEW_ICON" value="New.png"/>
+        <property name="LOAD_ICON" value="Load.png"/>
+        <property name="CLOSE_ICON" value="Close.png"/>
+        <property name="SAVE_ICON" value="Save.png"/>
+        <property name="SAVE_AS_ICON" value="SaveAs.png"/>
+        <property name="EXPORT_ICON" value="Export.png"/>
+        <property name="EXIT_ICON" value="Exit.png"/>
+
+        <!-- PROGRAM ICON FILES - UNDO/REDO TOOLBAR -->
+        <property name="UNDO_ICON" value="Undo.png"/>
+        <property name="REDO_ICON" value="Redo.png"/>
+
+        <!-- PROGRAM ICON FILES - FILE TOOLBAR -->
+        <property name="HELP_ICON" value="Help.png"/>
+        <property name="ABOUT_ICON" value="About.png"/>
+
+        <!-- metroMapMaker CONTROLS SETTINGS -->
+
+        <!-- metroMapMaker WORKSPACE ICONS -->
+        <property name="PLUS_ICON" value="plus.png"/>
+        <property name="MINUS_ICON" value="minus.png"/>
+
+        <property name="DEFAULT_LANGUAGE" value="English"/>
+        <property name="LANGUAGE_DIALOG_TITLE" value="App Language Selection"/>
+        <property name="LANGUAGE_DIALOG_HEADER_TEXT" value="Choose a Language"/>
+        <property name="LANGUAGE_DIALOG_CONTENT_TEXT" value="Select a Language for the User Interface."/>
+
+        <property name="DEFAULT_NODE_X" value="100"/>
+        <property name="DEFAULT_NODE_Y" value="100"/>
+
+    </property_list>
+    <property_options_list>
+        <property_options name="LANGUAGE_OPTIONS">
+            <option>English</option>
+        </property_options>
+        <property_options name="FONT_FAMILY_COMBO_BOX_OPTIONS">
+            <option>Dialog</option>
+            <option>DialogInput</option>
+            <option>Monospaced</option>
+            <option>Sans-serif</option>
+            <option>Serif</option>
+        </property_options>
+        <property_options name="FONT_SIZE_COMBO_BOX_OPTIONS">
+            <option>8</option>
+            <option>9</option>
+            <option>10</option>
+            <option>11</option>
+            <option>12</option>
+            <option>13</option>
+            <option>14</option>
+            <option>16</option>
+            <option>18</option>
+            <option>20</option>
+            <option>24</option>
+            <option>28</option>
+            <option>32</option>
+            <option>36</option>
+            <option>40</option>
+            <option>50</option>
+            <option>60</option>
+        </property_options>
+    </property_options_list>
+</properties>

@@ -1,0 +1,67 @@
+/*
+Nicholas Shaw
+110381707
+*/
+/*.button{
+    -fx-background-insets: 0,1,4,5; 
+    -fx-background-radius: 2,2,2,2; 
+    -fx-background-color: #8E8E8E;
+    -fx-text-fill: white;
+    -fx-font-family: 'Franklin Gothic Demi';
+    -fx-padding: 5 10 5 10;
+}*/
+.top-toolbar {
+    -fx-background-color: #8E8E8E;
+    -fx-border-color: #93CEFF;
+    -fx-border-width: 2;
+}
+.top-toolbar-sub {
+    -fx-background-color: #8E8E8E;
+}
+.edit-toolbar {
+    -fx-background-color: #8E8E8E;
+    -fx-border-color: #93CEFF;
+    -fx-border-width: 0 2 2 2;
+}
+.button, .color-picker, .combo-box, .toggle-button {
+    -fx-background-color: 
+        linear-gradient(#686868 0%, #232723 25%, #373837 75%, #757575 100%),
+        linear-gradient(#020b02, #3a3a3a),
+        #7F7F7F;
+    -fx-background-insets: 0,1,2,3;
+    -fx-background-radius: 2,2,2,2;
+    -fx-padding: 5 10 5 10;
+    -fx-font-family: 'Franklin Gothic Demi';
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow( three-pass-box , rgba(255,255,255,0.2) , 1, 0.0 , 0 , 1);
+}
+.button:hover, .color-picker:hover, .combo-box:hover, .toggle-button:hover {
+    -fx-background-color: 
+        linear-gradient(#686868 0%, #232723 25%, #373837 75%, #757575 100%),
+        linear-gradient(#020b02, #3a3a3a),
+        #93CEFF;
+}
+.labels {
+    -fx-font: 16px 'Franklin Gothic Demi';
+    -fx-fill: white;
+}
+#top-toolbar-sub .button, #top-toolbar .button {
+    -fx-background-color: 
+        linear-gradient(#686868 0%, #232723 25%, #373837 75%, #757575 100%),
+        linear-gradient(#020b02, #3a3a3a),
+        #44AAFF;
+    -fx-background-insets: 0,1,2,3;
+    -fx-background-radius: 2,2,2,2;
+    -fx-padding: 5 10 5 10;
+    -fx-font-family: 'Franklin Gothic Demi';
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow( three-pass-box , rgba(255,255,255,0.2) , 1, 0.0 , 0 , 1);
+}
+#top-toolbar-sub button:hover, #top-toolbar .button:hover {
+    -fx-background-color: 
+        linear-gradient(#686868 0%, #232723 25%, #373837 75%, #757575 100%),
+        linear-gradient(#020b02, #3a3a3a),
+        #93CEFF;
+}

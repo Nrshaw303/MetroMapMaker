@@ -1,0 +1,4 @@
+C://Users//Nick//Documents//NetBeansProjects//recitation-1//metroMapMaker//metroMapMaker//work//Bob.pose
+C://Users//Nick//Documents//NetBeansProjects//recitation-1//metroMapMaker//metroMapMaker//work//Junk.pm
+C://Users//Nick//Documents//NetBeansProjects//recitation-1//metroMapMaker//metroMapMaker//work//MyEllipses.pm
+C://Users//Nick//Documents//NetBeansProjects//recitation-1//metroMapMaker//metroMapMaker//work//Test.pm

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This XML file provides all the text to be used when the application
+    is to be displayed in English.
+-->
+<properties>
+    <property_list>        
+        
+        <!-- ENGLISH LANGUAGE SETTINGS FOR DESKTOP JAVA FRAMEWORK CONTROLS -->
+
+        <!-- APPLICATION-WIDE ERROR MESSAGES-->
+        <property name="APP_ERROR_TITLE" value="Application Error"/>
+        <property name="APP_ERROR_CONTENT" value="An Error Occured in the Application"/>
+        <property name="PROPERTIES_ERROR_TITLE" value="Properties File Error"/>
+        <property name="PROPERTIES_ERROR_CONTENT" value="There was an Error Loading a Properties File"/>
+                
+        <!-- DESKTOP JAVA FRAMEWORK CONTROLS - FILE TOOLBAR TOOLTIPS -->
+        <property name="NEW_TOOLTIP" value="Create a New Map"/>
+        <property name="LOAD_TOOLTIP" value="Load an Existing Map"/>
+        <property name="CLOSE_TOOLTIP" value="Close this Map"/>
+        <property name="SAVE_TOOLTIP" value="Save this Map"/>
+        <property name="SAVE_AS_TOOLTIP" value="Save As another Map"/>
+        <property name="EXIT_TOOLTIP" value="Exit the Application"/>
+        
+        <!-- DESKTOP JAVA FRAMEWORK CONTROLS - CUT TOOLBAR TOOLTIPS -->
+        <property name="CUT_TOOLTIP" value="Cut Selected Element"/>
+        <property name="COPY_TOOLTIP" value="Copy Selected Element"/>
+        <property name="PASTE_TOOLTIP" value="Paste Element from Clipboard"/>
+
+        <!-- DESKTOP JAVA FRAMEWORK CONTROLS - UNDO TOOLBAR TOOLTIPS -->
+        <property name="UNDO_TOOLTIP" value="Undo Last Edit"/>
+        <property name="REDO_TOOLTIP" value="Redo Most Recent Undo"/>
+        
+        <!-- DESKTOP JAVA FRAMEWORK CONTROLS - SETTINGS TOOLBAR TOOLTIPS -->
+        <property name="LANGUAGE_TOOLTIP" value="Open LANGUAGE Dialog"/>
+        <property name="HELP_TOOLTIP" value="Open Help Dialog"/>
+        <property name="ABOUT_TOOLTIP" value="Open About Dialog"/>
+
+        <!-- NEW FEEDBACK DIALOGS -->
+        <property name="NEW_SUCCESS_TITLE" value="New Complete"/>
+        <property name="NEW_SUCCESS_CONTENT" value="Work Created but not yet Saved"/>
+        <property name="NEW_ERROR_TITLE" value="Warning: Error"/>
+        <property name="NEW_ERROR_CONTENT" value="An error occured creating New work."/>
+
+        <!-- LOAD FEEDBACK DIALOGS -->
+        <property name="LOAD_WORK_TITLE" value="Load Work"/>
+        <property name="LOAD_SUCCESS_TITLE" value="Load Complete"/>
+        <property name="LOAD_SUCCESS_CONTENT" value="The File has Loaded Successfully and can now be edited."/>
+        <property name="LOAD_ERROR_TITLE" value="Loading Error"/>
+        <property name="LOAD_ERROR_CONTENT" value="Loading has Failed. Likely there is a File Formating problem."/>
+
+        <!-- SAVE FEEDBACK DIALOGS -->
+        <property name="SAVE_WORK_TITLE" value="Save Work"/>
+        <property name="SAVE_SUCCESS_TITLE" value="Save Complete"/>
+        <property name="SAVE_SUCCESS_CONTENT" value="The file is saved."/>
+        <property name="SAVE_ERROR_TITLE" value="Save Error"/>
+        <property name="SAVE_ERROR_CONTENT" value="Saving has Failed. Likely due to a file access problem."/>
+        <property name="SAVE_VERIFY_TITLE" value="Save unsaved work?"/>
+        <property name="SAVE_VERIFY_CONTENT" value="Would you like to save your unsaved work first?"/>
+
+        <property name="ABOUT_TITLE" value="About Metro Map Maker"/>
+        <property name="ABOUT_CONTENT" value="Metro Map Maker - Debugging Enterprises - © 2017"/>
+
+        <property name="WORK_FILE_EXT" value="pm"/>
+        <property name="WORK_FILE_EXT_DESC" value="Metro Map Maker Files"/>
+
+        <!-- 2) LANGUAGE SETTINGS FOR metroMapMaker CONTROLS  -->
+
+        <!-- TO SWITCH BACK TO ANOTHER LANGUAGE -->
+        <property name="LANGUAGE_DIALOG_TITLE" value="App Language Selection"/>
+        <property name="LANGUAGE_DIALOG_HEADER_TEXT" value="Choose a Language"/>
+        <property name="LANGUAGE_DIALOG_CONTENT_TEXT" value="Select a Language for the User Interface."/>
+
+    </property_list>
+    
+    <!-- metroMapMaker COMBO BOX CHOICES -->
+    <property_options_list>
+        <property_options name="LANGUAGE_OPTIONS">
+            <option>English</option>
+            <option>Korean</option>
+        </property_options>
+        <property_options name="FONT_FAMILY_COMBO_BOX_OPTIONS">
+            <option>Dialog</option>
+            <option>DialogInput</option>
+            <option>Monospaced</option>
+            <option>Sans-serif</option>
+            <option>Serif</option>            
+        </property_options>
+    </property_options_list>
+</properties>

@@ -1,0 +1,44 @@
+/*
+Nicholas Shaw
+110381707
+*/
+.button {
+    -fx-background-insets: 0,1,4,5; 
+    -fx-background-radius: 2,2,2,2; 
+    -fx-padding: 12 30 12 30; 
+    -fx-text-fill: white; 
+    -fx-font-size: 18px;
+    -fx-font-family: 'Franklin Gothic Demi';
+}
+#main {
+    -fx-background-color: #7F7F7F;
+}
+#main .button{
+    -fx-background-color: #7F7F7F;
+}
+#main .button:hover{
+    -fx-background-color: #93CEFF;
+}
+#slide-menu {
+    -fx-background-color: #93CEFF;
+}
+#slide-menu .button {
+    -fx-background-color: #93CEFF;
+}
+#slide-menu .button:hover {
+    -fx-background-color: #44AAFF;
+}
+#slide-menu .separator *.line{
+    -fx-border-style: solid;
+    -fx-border-width: 0,0,1,0;
+    -fx-border-color: #44AAFF;
+}
+#side-menu {
+    -fx-background-color: #8E8E8E;
+}
+#side-menu .button{
+    -fx-background-color: #8E8E8E;
+}
+#side-menu .button:hover{
+    -fx-background-color: #93CEFF;
+}
