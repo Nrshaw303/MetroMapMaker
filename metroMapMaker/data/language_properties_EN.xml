@@ -63,6 +63,14 @@
 
         <property name="WORK_FILE_EXT" value="pm"/>
         <property name="WORK_FILE_EXT_DESC" value="Metro Map Maker Files"/>
+        
+        <!-- EXPORT FEEDBACK DIALOGS -->
+        <property name="EXPORT_WORK_TITLE" value="Exporting"/>
+        <property name="EXPORT_WORK_CONTENT" value="Are you sure you want to export?"/>
+        <property name="EXPORT_SUCCESS_TITLE" value="Export Success"/>
+        <property name="EXPORT_SUCCESS_CONTENT" value="Map Export Complete"/>
+        <property name="EXPORT_FAILURE_TITLE" value="Export Failure"/>
+        <property name="EXPORT_FAILURE_CONTENT" value="Map Was Not Exported"/>
 
         <!-- 2) LANGUAGE SETTINGS FOR metroMapMaker CONTROLS  -->
 
