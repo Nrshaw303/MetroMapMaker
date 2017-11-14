@@ -1,5 +1,7 @@
 package map.gui;
 
+import static djf.AppPropertyType.SAVE_VERIFY_CONTENT;
+import static djf.AppPropertyType.SAVE_VERIFY_TITLE;
 import java.io.IOException;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
@@ -22,6 +24,7 @@ import djf.components.AppWorkspaceComponent;
 import djf.language.AppLanguageSettings;
 import static djf.language.AppLanguageSettings.FILE_PROTOCOL;
 import static djf.language.AppLanguageSettings.PATH_IMAGES;
+import djf.ui.AppDialogs;
 import static djf.ui.AppGUI.DISABLED;
 import static djf.ui.AppGUI.ENABLED;
 import djf.ui.FileController;
@@ -37,6 +40,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
@@ -456,7 +460,18 @@ public class mapWorkspace extends AppWorkspaceComponent {
     
     // HELPER SETUP METHOD
     private void initControllers() {
-	
+	app.getGUI().getWindow().setOnCloseRequest(i ->{
+            ButtonType sellection = AppDialogs.showYesNoCancelDialog(app.getGUI().getWindow(), SAVE_VERIFY_TITLE, SAVE_VERIFY_CONTENT);
+            if (sellection == ButtonType.YES) {
+                i.consume();
+            } 
+            else if (sellection == ButtonType.NO) {
+                app.getGUI().getWindow().close();
+            }
+            else{
+                i.consume();
+            }
+        });
     }
 
     // HELPER METHOD
