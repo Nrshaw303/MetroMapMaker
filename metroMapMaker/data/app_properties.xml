@@ -27,7 +27,7 @@
         <property name="HAS_SAVE" value="true"/>
         <property name="HAS_SAVE_AS" value="true"/>
         <property name="HAS_EXPORT" value="true"/>
-        <property name="HAS_EXIT" value="true"/>
+        <property name="HAS_EXIT" value="false"/>
         <property name="HAS_CUT_TOOLBAR" value="false"/>
         <property name="HAS_UNDO_TOOLBAR" value="true"/>
         <property name="HAS_SETTINGS_TOOLBAR" value="true"/>
