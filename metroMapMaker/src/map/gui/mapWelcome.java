@@ -158,7 +158,7 @@ public class mapWelcome {
             
             while ((line = bufferedReader.readLine()) != null){
                 File file = new File(line);
-                if (file.exists()){
+                if (true){
                     String[] lineArray = line.split("//");
                     Button recentFile = new Button(lineArray[lineArray.length - 1]);
                     recentFile.setMaxSize(200, 50);
