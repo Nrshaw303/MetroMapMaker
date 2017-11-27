@@ -41,6 +41,9 @@ public class AppGUI {
 
     // THIS IS THE STAGE'S SCENE GRAPH
     protected Scene primaryScene;
+    
+    // FILE CONTROLLER COMPONENT
+    protected FileController fileController;
 
     // THIS PANE ORGANIZES THE BIG PICTURE CONTAINERS FOR THE
     // APPLICATION AppGUI. NOTE THAT THE WORKSPACE WILL GO
@@ -207,6 +210,10 @@ public class AppGUI {
     public Stage getWindow() {
         return primaryStage;
     }
+    
+    public FileController getFileController(){
+        return fileController;
+    }
 
     /**
      * This method is used to activate/deactivate toolbar buttons after each work edit such that they can be usable or
@@ -260,7 +267,7 @@ public class AppGUI {
     private void initFileToolbar() {
         fileToolbar = new ToolBar();
         topToolbarPane.getChildren().add(fileToolbar);
-        FileController fileController = new FileController(app);
+        fileController = new FileController(app);
         if (isTrue(HAS_NEW)) {
             newButton = initToolBarChildButton(fileToolbar, NEW_BUTTON_PREFIX, ENABLED);
             newButton.setOnAction(e -> fileController.processNewRequest());

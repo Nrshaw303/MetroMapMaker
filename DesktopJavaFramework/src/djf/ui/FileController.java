@@ -177,6 +177,30 @@ public class FileController {
             AppDialogs.showMessageDialog(app.getGUI().getWindow(), EXPORT_FAILURE_TITLE, EXPORT_FAILURE_CONTENT);
         }
     }
+    
+    public void processLoadRecentRequest(File recentFile){
+        if (recentFile != null) {
+            try {
+                // RESET THE WORKSPACE
+                app.getWorkspaceComponent().resetLanguage();
+
+                // RESET THE DATA
+                app.getDataComponent().resetData();
+
+                // LOAD THE FILE INTO THE DATA
+                app.getFileComponent().loadData(app.getDataComponent(), recentFile.getAbsolutePath());
+
+                // MAKE SURE THE WORKSPACE IS ACTIVATED
+                app.getWorkspaceComponent().activateWorkspace(app.getGUI().getAppPane());
+
+                // AND MAKE SURE THE FILE BUTTONS ARE PROPERLY ENABLED
+                saved = true;
+                app.getGUI().updateToolbarControls(saved);
+            } catch (Exception e) {
+                AppDialogs.showMessageDialog(app.getGUI().getWindow(), LOAD_ERROR_TITLE, LOAD_ERROR_CONTENT);
+            }
+        }
+    }
 
     /**
      * This method will exit the application, making sure the user doesn't lose any data first.
