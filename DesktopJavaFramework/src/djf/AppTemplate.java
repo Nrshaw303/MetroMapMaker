@@ -11,6 +11,9 @@ import static djf.AppPropertyType.*;
 import djf.language.AppLanguageSettings;
 
 import static djf.language.AppLanguageSettings.*;
+import djf.welcome.AppWelcomeDialog;
+import static djf.welcome.AppWelcomeDialog.*;
+import java.io.File;
 
 import jtps.jTPS;
 import properties_manager.InvalidXMLFileFormatException;
@@ -48,6 +51,11 @@ public abstract class AppTemplate extends Application {
 
     // THE COMPONENT FOR THE CLIPBOARD
     protected AppClipboardComponent clipboardComponent;
+    
+    // THE COMPONENT FOR THE WELCOME DIALOG
+    protected AppWelcomeComponent welcomeComponent;
+    protected String requestType;
+    protected File recentFile;
 
     // THIS IS FOR MANAGING UNDO/REDO
     protected jTPS tps;
@@ -79,6 +87,11 @@ public abstract class AppTemplate extends Application {
      * Accessor for the clipboard.
      */
     public AppClipboardComponent getClipboardComponent() { return clipboardComponent; }
+    
+    /**
+     * Accessor for the welcome dialog
+     */
+    public AppWelcomeComponent getWelcomeComponent() { return welcomeComponent; }
 
     /**
      * Accessor for the languageSettings.
@@ -140,7 +153,19 @@ public abstract class AppTemplate extends Application {
 
                 // LOAD ALL THE PROPER TEXT INTO OUR CONTROLS
                 languageSettings.resetLanguage();
-
+                
+                // CALL WELCOME STAGE
+                welcomeComponent = new AppWelcomeDialog(this);
+                requestType = welcomeComponent.initWelcome();
+                
+                if (requestType == NEW_MAP_REQUEST){
+                    workspaceComponent.activateWorkspace(gui.getAppPane());
+                }
+                else if (requestType == LOAD_MAP_REQUEST){
+                    recentFile = welcomeComponent.getRecentFile();
+                    gui.getFileController().processLoadRecentRequest(recentFile);
+                }
+                
                 // NOW OPEN UP THE WINDOW
                 primaryStage.show();
             }

@@ -61,8 +61,6 @@ import javafx.stage.Stage;
 import map.data.MetroLine;
 import map.data.MetroStation;
 import properties_manager.PropertiesManager;
-import static map.gui.mapWelcome.NEW_MAP_REQUEST;
-import static map.gui.mapWelcome.LOAD_MAP_REQUEST;
 
 /**
  * This class serves as the workspace component for this application, providing
@@ -78,9 +76,6 @@ public class mapWorkspace extends AppWorkspaceComponent {
 
     // IT KNOWS THE GUI IT IS PLACED INSIDE
     AppGUI gui;
-    
-    // WELCOME DIALOG
-    mapWelcome welcome;
 
     // HAS ALL THE CONTROLS FOR EDITING
     VBox editToolbar;
@@ -198,9 +193,6 @@ public class mapWorkspace extends AppWorkspaceComponent {
         
         // AND INIT THE STYLE FOR THE WORKSPACE
         initStyle();
-        
-        welcome = new mapWelcome(app);
-        requestType = welcome.initWelcome();
     }
     
     /**
