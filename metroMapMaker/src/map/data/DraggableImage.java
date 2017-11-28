@@ -22,17 +22,6 @@ public class DraggableImage extends ImageView implements Draggable {
     }
     
     @Override
-    public DraggableImage makeClone() {
-        DraggableImage cloneImage = new DraggableImage();
-        cloneImage.setImage(getImage());
-        PropertiesManager props = PropertiesManager.getPropertiesManager();
-        cloneImage.setX(Double.parseDouble(props.getProperty(DEFAULT_NODE_X)));
-        cloneImage.setY(Double.parseDouble(props.getProperty(DEFAULT_NODE_Y)));
-        cloneImage.setOpacity(getOpacity());
-        return cloneImage;
-    }
-    
-    @Override
     public mapState getStartingState() {
 	return mapState.STARTING_RECTANGLE;
     }

@@ -1,5 +1,6 @@
 package map.data;
 
+import static javafx.scene.paint.Color.rgb;
 import static map.mapPropertyType.DEFAULT_NODE_X;
 import static map.mapPropertyType.DEFAULT_NODE_Y;
 import javafx.scene.shape.Circle;
@@ -35,20 +36,6 @@ public class DraggableCircle extends Circle implements Draggable {
 	setOpacity(1.0);
 	startCenterX = x;
 	startCenterY = y;
-    }
-    
-    @Override
-    public MetroStation makeClone() {
-        MetroStation cloneCircle = new MetroStation();
-        cloneCircle.setRadius(getRadius());
-        PropertiesManager props = PropertiesManager.getPropertiesManager();
-        cloneCircle.setCenterX(Double.parseDouble(props.getProperty(DEFAULT_NODE_X)));
-        cloneCircle.setCenterY(Double.parseDouble(props.getProperty(DEFAULT_NODE_Y)));
-        cloneCircle.setOpacity(getOpacity());
-        cloneCircle.setFill(getFill());
-        cloneCircle.setStroke(getStroke());
-        cloneCircle.setStrokeWidth(getStrokeWidth());
-        return cloneCircle;
     }
     
     @Override
@@ -122,6 +109,6 @@ public class DraggableCircle extends Circle implements Draggable {
     
     @Override
     public String getNodeType() {
-	return ELLIPSE;
+	return CIRCLE;
     }
 }

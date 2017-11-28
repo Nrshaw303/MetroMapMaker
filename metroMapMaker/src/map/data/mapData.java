@@ -12,14 +12,16 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
-import static map.data.mapState.SIZING_SHAPE;
 import map.gui.mapWorkspace;
 import djf.components.AppDataComponent;
 import djf.AppTemplate;
-import static map.data.mapState.SELECTING_NODE;
-//import map.transactions.AddNode_Transaction;
+import static javafx.scene.paint.Color.rgb;
+import static map.data.mapState.*;
 import javafx.scene.text.Text;
 import jtps.jTPS;
+import static map.data.Draggable.LINE;
+import map.gui.LayerController;
+import map.transactions.AddNode_Transaction;
 
 /**
  * This class serves as the data management component for this application.
@@ -32,7 +34,7 @@ public class mapData implements AppDataComponent {
     // FIRST THE THINGS THAT HAVE TO BE SAVED TO FILES
     
     // THESE ARE THE NODES IN THE LOGO
-    ObservableList<Node> logoNodes;
+    ObservableList<Node> mapNodes;
         
     // THIS IS THE SHAPE CURRENTLY BEING SIZED BUT NOT YET ADDED
     Shape newShape;
@@ -46,15 +48,16 @@ public class mapData implements AppDataComponent {
     // THIS IS A SHARED REFERENCE TO THE APPLICATION
     AppTemplate app;
     
+    mapWorkspace mapWorkspace;
+    
     // USE THIS WHEN THE NODE IS SELECTED
     Effect highlightedEffect;
 
     public static final String WHITE_HEX = "#FFFFFF";
     public static final String BLACK_HEX = "#000000";
-    public static final String YELLOW_HEX = "#EEEE00";
     public static final Paint DEFAULT_BACKGROUND_COLOR = Paint.valueOf(WHITE_HEX);
-    public static final Paint HIGHLIGHTED_COLOR = Paint.valueOf(YELLOW_HEX);
-    public static final int HIGHLIGHTED_STROKE_THICKNESS = 3;
+    public static final Color HIGHLIGHTED_COLOR = Color.valueOf("#93CEFF");
+    public static final int HIGHLIGHTED_STROKE_THICKNESS = 10;
 
     /**
      * THis constructor creates the data manager and sets up the
@@ -72,26 +75,24 @@ public class mapData implements AppDataComponent {
 
 	// THIS IS FOR THE SELECTED SHAPE
 	DropShadow dropShadowEffect = new DropShadow();
-	dropShadowEffect.setOffsetX(0.0f);
-	dropShadowEffect.setOffsetY(0.0f);
-	dropShadowEffect.setSpread(1.0);
-	dropShadowEffect.setColor(Color.YELLOW);
+	dropShadowEffect.setSpread(0.9);
+	dropShadowEffect.setColor(HIGHLIGHTED_COLOR);
 	dropShadowEffect.setBlurType(BlurType.GAUSSIAN);
-	dropShadowEffect.setRadius(15);
+	dropShadowEffect.setRadius(HIGHLIGHTED_STROKE_THICKNESS);
 	highlightedEffect = dropShadowEffect;
     }
     
     public ObservableList<Node> getLogoNodes() {
-	return logoNodes;
+	return mapNodes;
     }
     
     public void setLogoNodes(ObservableList<Node> initLogoNodes) {
-	logoNodes = initLogoNodes;
+	mapNodes = initLogoNodes;
     }
     
     public void removeSelectedNode() {
 	if (selectedNode != null) {
-	    logoNodes.remove(selectedNode);
+	    mapNodes.remove(selectedNode);
 	    selectedNode = null;
 	}
     }
@@ -107,7 +108,7 @@ public class mapData implements AppDataComponent {
 	newShape = null;
 	selectedNode = null;
 	
-	//logoNodes.clear();
+	mapNodes.clear();
 	((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().clear();
         ((mapWorkspace)app.getWorkspaceComponent()).initDebugText();
     }
@@ -129,9 +130,6 @@ public class mapData implements AppDataComponent {
 	selectedNode = newShape;
 	highlightNode(selectedNode);
 	newShape = null;
-	if (state == SIZING_SHAPE) {
-	    state = ((Draggable)selectedNode).getStartingState();
-	}
     }
     
     public void unhighlightNode(Node node) {
@@ -142,18 +140,50 @@ public class mapData implements AppDataComponent {
 	node.setEffect(highlightedEffect);
     }
 
-    public void startNewRectangle(int x, int y) {
-	DraggableRectangle newRectangle = new DraggableRectangle();
-	newRectangle.start(x, y);
-	newShape = newRectangle;
+    public void startNewStation(int x, int y, String name) {
+        DraggableText label = new DraggableText(name);
+        label.start(x, y);
+        label.setIsForStation(true);
+        newShape = label;
+        initNewShape();
+        
+	MetroStation newStation = new MetroStation(label.getX() - 15, label.getY() + 10, 10);
+        newStation.setFill(rgb(255,255,255));
+        newStation.setStroke(rgb(0,0,0));
+        newStation.setAssociatedLabel(label);
+        label.setAssociatedStation(newStation);
+	newShape = newStation;
 	initNewShape();
+        
+        mapWorkspace = (mapWorkspace)app.getWorkspaceComponent();
+        mapWorkspace.addStationToList(newStation);
     }
-
-    public void startNewEllipse(int x, int y) {
-	DraggableEllipse newEllipse = new DraggableEllipse();
-	newEllipse.start(x, y);
-	newShape = newEllipse;
-	initNewShape();
+    
+    public void startNewLine(int x1, int y1, int x2, int y2, String name, Color color){
+        LayerController layerController = new LayerController(app);
+        DraggableText start = new DraggableText(name);
+        start.setIsForLine(true);
+        start.setIsStart(true);
+        start.start(x1, y1);
+        newShape = start;
+        initNewShape();
+        DraggableText end = new DraggableText(name);
+        end.setIsForLine(true);
+        end.start(x2, y2);
+        newShape = end;
+        initNewShape();
+        
+        MetroLine line = new MetroLine(5, color);
+        line.getPoints().addAll(new Double[]{start.getX(), start.getY(), end.getX(), end.getY()});
+        start.setAssociatedLine(line);
+        end.setAssociatedLine(line);
+        line.setAssociatedStartLabel(start);
+        line.setAssociatedEndLabel(end);
+        newShape = line;
+        initNewShape();
+        
+        mapWorkspace = (mapWorkspace)app.getWorkspaceComponent();
+        mapWorkspace.addLineToList(line);
     }
 
     public void initNewShape() {
@@ -170,13 +200,13 @@ public class mapData implements AppDataComponent {
 //	newShape.setStrokeWidth(workspace.getOutlineThicknessSlider().getValue());
 	
 	// GO INTO SHAPE SIZING MODE
-	state = mapState.SIZING_SHAPE;
+	state = mapState.SELECTING_NODE;
 	
 	// FINALLY, ADD A TRANSACTION FOR ADDING THE NEW SHAPE
         jTPS tps = app.getTPS();
         mapData data = (mapData)app.getDataComponent();
-//        AddNode_Transaction newTransaction = new AddNode_Transaction(data, newShape);
-//        tps.addTransaction(newTransaction);
+        AddNode_Transaction newTransaction = new AddNode_Transaction(data, newShape);
+        tps.addTransaction(newTransaction);
     }
 
     public Shape getNewShape() {
@@ -199,21 +229,21 @@ public class mapData implements AppDataComponent {
 	if (selectedNode != null) {
 	    unhighlightNode(selectedNode);
 	}
-	if (node != null) {
-	    highlightNode(node);
-	    mapWorkspace workspace = (mapWorkspace)app.getWorkspaceComponent();
-	    workspace.loadSelectedNodeSettings(node);
-	}
-	selectedNode = node;
-	if (node != null) {
-            ((Draggable)node).setStart(x, y);
-	}
+        if (node != null) {
+            highlightNode(node);
+            mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
+            workspace.loadSelectedNodeSettings(node);
+        }
+        selectedNode = node;
+        if (node != null && !(node instanceof MetroLine)) {
+            ((Draggable) node).setStart(x, y);
+        }
 	return node;
     }
     
     public boolean isShape(Draggable node) {
-        return ((node.getNodeType() == Draggable.ELLIPSE) 
-                || (node.getNodeType() == Draggable.RECTANGLE)
+        return ((node.getNodeType() == Draggable.LINE) 
+                || (node.getNodeType() == Draggable.STATION)
                 || (node.getNodeType() == Draggable.TEXT));
     }
     
@@ -225,8 +255,8 @@ public class mapData implements AppDataComponent {
     }
 
     public Node getTopNode(int x, int y) {
-	for (int i = logoNodes.size() - 1; i >= 0; i--) {
-	    Node node = (Node)logoNodes.get(i);
+	for (int i = mapNodes.size() - 1; i >= 0; i--) {
+	    Node node = (Node)mapNodes.get(i);
 	    if (node.contains(x, y)) {
 		return node;
 	    }
@@ -249,68 +279,73 @@ public class mapData implements AppDataComponent {
     // METHODS NEEDED BY TRANSACTIONS
     
     public void moveNodeToFront(Node nodeToMove) {
-        int currentIndex = logoNodes.indexOf(nodeToMove);
+        int currentIndex = mapNodes.indexOf(nodeToMove);
         if (currentIndex >= 0) {
-            logoNodes.remove(currentIndex);
-	    if (logoNodes.isEmpty()) {
-		logoNodes.add(nodeToMove);
+            mapNodes.remove(currentIndex);
+	    if (mapNodes.isEmpty()) {
+		mapNodes.add(nodeToMove);
 	    }
 	    else {
 		ArrayList<Node> temp = new ArrayList();
 		temp.add(nodeToMove);
-		for (Node node : logoNodes)
+		for (Node node : mapNodes)
 		    temp.add(node);
-		logoNodes.clear();
+		mapNodes.clear();
 		for (Node node : temp)
-                    logoNodes.add(node);
+                    mapNodes.add(node);
 	    }            
         }
     }
     
     public void moveNodeToBack(Node nodeToMove) {
-        int currentIndex = logoNodes.indexOf(nodeToMove);
+        int currentIndex = mapNodes.indexOf(nodeToMove);
         if (currentIndex >= 0) {
-	    logoNodes.remove(currentIndex);
-	    logoNodes.add(nodeToMove);
+	    mapNodes.remove(currentIndex);
+	    mapNodes.add(nodeToMove);
         }
     }
     
     public void moveNodeToIndex(Node nodeToMove, int index) {
-        int currentIndex = logoNodes.indexOf(nodeToMove);
-        int numberOfNodes = logoNodes.size();
+        int currentIndex = mapNodes.indexOf(nodeToMove);
+        int numberOfNodes = mapNodes.size();
         if ((currentIndex >= 0) && (index >= 0) && (index < numberOfNodes)) {
             // IS IT SUPPOSED TO BE THE LAST ONE?
             if (index == (numberOfNodes-1)) {
-                logoNodes.remove(currentIndex);
-                logoNodes.add(nodeToMove);
+                mapNodes.remove(currentIndex);
+                mapNodes.add(nodeToMove);
             }
             else {
-                logoNodes.remove(currentIndex);
-                logoNodes.add(index, nodeToMove);
+                mapNodes.remove(currentIndex);
+                mapNodes.add(index, nodeToMove);
             }
         }
     }
     
     public void removeNode(Node nodeToRemove) {
-        int currentIndex = logoNodes.indexOf(nodeToRemove);
+        int currentIndex = mapNodes.indexOf(nodeToRemove);
         if (currentIndex >= 0) {
-	    logoNodes.remove(currentIndex);
+	    mapNodes.remove(currentIndex);
         }
     }    
     
     public void addNode(Node nodeToAdd) {
-        int currentIndex = logoNodes.indexOf(nodeToAdd);
+        int currentIndex = mapNodes.indexOf(nodeToAdd);
         if (currentIndex < 0) {
-	    logoNodes.add(nodeToAdd);
+	    mapNodes.add(nodeToAdd);
+        }
+        for (int i = 0; i < mapNodes.size(); i++){
+            if (mapNodes.get(i) instanceof MetroStation){
+                mapNodes.add(mapNodes.remove(i));
+            }
         }
     }
 
     public int getIndexOfNode(Node node) {
-        return logoNodes.indexOf(node);
+        return mapNodes.indexOf(node);
     }
 
     public void addNodeAtIndex(Node node, int nodeIndex) {
-        logoNodes.add(nodeIndex, node);    
+        mapNodes.add(nodeIndex, node);    
     }
 
     public boolean isTextSelected() {

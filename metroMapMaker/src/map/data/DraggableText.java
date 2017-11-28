@@ -1,68 +1,64 @@
 package map.data;
 
-import static map.mapPropertyType.DEFAULT_NODE_X;
-import static map.mapPropertyType.DEFAULT_NODE_Y;
 import javafx.scene.text.Text;
-import properties_manager.PropertiesManager;
+import map.data.Draggable;
+import map.data.mapState;
 
 /**
- *
- * @author McKillaGorilla
+ * This is a draggable rectangle for our goLogoLo application.
+ * 
+ * @author Richard McKenna
+ * @author Nicholas Shaw
+ * @version 1.0
  */
 public class DraggableText extends Text implements Draggable {
     double startX;
     double startY;
+    boolean isForLine;
+    boolean isStartLabel;
+    boolean isForStation;
+    MetroLine associatedLine = null;
+    MetroStation associatedStation = null;
     
-    public DraggableText(String initText) {
-        super(initText);
+    public DraggableText() {
 	setX(0.0);
 	setY(0.0);
-	//setWidth(0.0);
-	//setHeight(0.0);
 	setOpacity(1.0);
 	startX = 0.0;
 	startY = 0.0;
     }
     
-    @Override
-    public DraggableText makeClone() {
-        DraggableText cloneText = new DraggableText(getText());
-        PropertiesManager props = PropertiesManager.getPropertiesManager();
-        cloneText.setX(Double.parseDouble(props.getProperty(DEFAULT_NODE_X)));
-        cloneText.setY(Double.parseDouble(props.getProperty(DEFAULT_NODE_Y)));
-        cloneText.setFont(getFont());
-        cloneText.setOpacity(getOpacity());
-        cloneText.setFill(getFill());
-        cloneText.setStroke(getStroke());
-        cloneText.setStrokeWidth(getStrokeWidth());
-        return cloneText;
+    public DraggableText(String text) {
+        setX(0.0);
+        setY(0.0);
+        setOpacity(1.0);
+        startX = 0.0;
+        startY = 0.0;
+        setText(text);
     }
     
     @Override
     public mapState getStartingState() {
-	return mapState.STARTING_RECTANGLE;
+	return null;
     }
     
     @Override
     public void start(int x, int y) {
 	startX = x;
 	startY = y;
-	setX(x);
-	setY(y);
+        setX(x);
+        setY(y);
     }
     
-    @Override
-    public void setStart(int initStartX, int initStartY) {
-        startX = initStartX;
-        startY = initStartY;
+    public void startDrag(int x, int y) {
+	startX = x;
+	startY = y;
     }
     
     @Override
     public void drag(int x, int y) {
-	//double diffX = x - (getX() + (getWidth()/2));
-	//double diffY = y - (getY() + (getHeight()/2));
-        double diffX = x - startX;
-        double diffY = y - startY;
+	double diffX = x - startX;
+	double diffY = y - startY;
 	double newX = getX() + diffX;
 	double newY = getY() + diffY;
 	xProperty().set(newX);
@@ -77,28 +73,90 @@ public class DraggableText extends Text implements Draggable {
     
     @Override
     public void size(int x, int y) {
-	// WE DON'T CARE ABOUT THIS FOR TEXT
+	double width = x - getX();
+	double height = y - getY();	
     }
     
     @Override
     public void setLocationAndSize(double initX, double initY, double initWidth, double initHeight) {
 	xProperty().set(initX);
 	yProperty().set(initY);
-        // WE DON'T CARE ABOUT HTE SIZE
     }
     
-    @Override
-    public String getNodeType() {
-	return RECTANGLE;
-    }    
+    public String getShapeType() {
+	return TEXT;
+    }
 
     @Override
     public double getWidth() {
-        return 0;
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public double getHeight() {
-        return 0;
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public DraggableText duplicateText(){
+        DraggableText newText = new DraggableText();
+        newText.setText(this.getText());
+        newText.setX(0);
+        newText.setY(0);
+        newText.setFont(this.getFont());
+        newText.setFill(this.getFill());
+        newText.setStroke(this.getStroke());
+        newText.setStrokeWidth(this.getStrokeWidth());
+        return newText;
+    }
+
+    @Override
+    public String getNodeType() {
+        return TEXT;
+    }
+
+    @Override
+    public void setStart(int initX, int initY) {
+        startX = initX;
+        startY = initY;
+    }
+    
+    public void setIsForLine(boolean isForLine){
+        this.isForLine = isForLine;
+    }
+    
+    public void setIsForStation(boolean isForStation){
+        this.isForStation = isForStation;
+    }
+    
+    public void setIsStart(boolean isStartLabel){
+        this.isStartLabel = isStartLabel;
+    }
+    
+    public void setAssociatedLine(MetroLine associatedLine){
+        this.associatedLine = associatedLine;
+    }
+    
+    public void setAssociatedStation(MetroStation associatedStation){
+        this.associatedStation = associatedStation;
+    }
+    
+    public boolean getIsForLine(){
+        return isForLine;
+    }
+    
+    public boolean getIsForStation(){
+        return isForStation;
+    }
+    
+    public boolean getIsStartLabel(){
+        return isStartLabel;
+    }
+    
+    public MetroStation getAssociatedStation(){
+        return associatedStation;
+    }
+    
+    public MetroLine getAssociatedLine(){
+        return associatedLine;
     }
 }

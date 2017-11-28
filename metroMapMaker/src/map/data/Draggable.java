@@ -8,11 +8,11 @@ package map.data;
  * @version 1.0
  */
 public interface Draggable {
-    public static final String RECTANGLE = "RECTANGLE";
-    public static final String ELLIPSE = "ELLIPSE";
-    public static final String TEXT = "TEXT";
+    public static final String STATION = "STATION";
+    public static final String LINE = "LINE";
     public static final String IMAGE = "IMAGE";
-    public Draggable makeClone();
+    public static final String CIRCLE = "CIRCLE";
+    public static final String TEXT = "TEXT";
     public mapState getStartingState();
     public void start(int x, int y);
     public void drag(int x, int y);

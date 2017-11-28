@@ -1,5 +1,7 @@
 package map.data;
 
+import java.util.ArrayList;
+import static javafx.scene.paint.Color.rgb;
 import static map.mapPropertyType.DEFAULT_NODE_X;
 import static map.mapPropertyType.DEFAULT_NODE_Y;
 import javafx.scene.shape.Circle;
@@ -13,9 +15,11 @@ import properties_manager.PropertiesManager;
  * @author ?
  * @version 1.0
  */
-public class MetroStation extends DraggableCircle implements Draggable {
+public class MetroStation extends DraggableCircle{
     double startCenterX;
     double startCenterY;
+    DraggableText associatedLabel;
+    ArrayList<MetroLine> lines;
     
     public MetroStation() {
 	setCenterX(0.0);
@@ -24,20 +28,19 @@ public class MetroStation extends DraggableCircle implements Draggable {
 	setOpacity(1.0);
 	startCenterX = 0.0;
 	startCenterY = 0.0;
+        associatedLabel = new DraggableText();
+        lines = new ArrayList<>();
     }
     
-    @Override
-    public MetroStation makeClone() {
-        MetroStation cloneEllipse = new MetroStation();
-        cloneEllipse.setRadius(getRadius());
-        PropertiesManager props = PropertiesManager.getPropertiesManager();
-        cloneEllipse.setCenterX(Double.parseDouble(props.getProperty(DEFAULT_NODE_X)));
-        cloneEllipse.setCenterY(Double.parseDouble(props.getProperty(DEFAULT_NODE_Y)));
-        cloneEllipse.setOpacity(getOpacity());
-        cloneEllipse.setFill(getFill());
-        cloneEllipse.setStroke(getStroke());
-        cloneEllipse.setStrokeWidth(getStrokeWidth());
-        return cloneEllipse;
+    public MetroStation(double x, double y, int radius){
+	setCenterX(x);
+	setCenterY(y);
+	setRadius(radius);
+	setOpacity(1.0);
+	startCenterX = 0.0;
+	startCenterY = 0.0;
+        associatedLabel = new DraggableText();
+        lines = new ArrayList<>();
     }
     
     @Override
@@ -112,5 +115,25 @@ public class MetroStation extends DraggableCircle implements Draggable {
     @Override
     public String getNodeType() {
 	return STATION;
+    }
+    
+    public DraggableText getAssociatedLabel(){
+        return associatedLabel;
+    }
+    
+    public void setAssociatedLabel(DraggableText associatedLabel){
+        this.associatedLabel = associatedLabel;
+    }
+    
+    public void addLine(MetroLine line){
+        lines.add(line);
+    }
+    
+    public void removeLine(MetroLine line){
+        lines.remove(line);
+    }
+    
+    public ArrayList<MetroLine> getLines(){
+        return lines;
     }
 }

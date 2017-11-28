@@ -1,11 +1,15 @@
 package map.data;
 
+import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventType;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Polyline;
+import javafx.scene.shape.Shape;
+import static map.data.Draggable.LINE;
 import properties_manager.PropertiesManager;
 
 /**
@@ -15,60 +19,30 @@ import properties_manager.PropertiesManager;
  * @author ?
  * @version 1.0
  */
-public class MetroLine {
+public class MetroLine extends Polyline{
+    String name;
     DraggableCircle start;
     DraggableCircle end;
     double thickness;
     Paint color;
     ObservableList<DraggableCircle> stations;
+    ArrayList<String> stationNames;
     ObservableList<Line> lines;
+    DraggableText startLabel;
+    DraggableText endLabel;
+    
+    public MetroLine() {
+        lines = FXCollections.observableArrayList();
+        stations = FXCollections.observableArrayList();
+        stationNames = new ArrayList<>();
+    }
     
     public MetroLine(double thickness, Paint color) {
-        start = new DraggableCircle(10, 10, 5);
-        end = new DraggableCircle(40, 40, 5);
         lines = FXCollections.observableArrayList();
-        this.thickness = thickness;
-        this.color = color;
+        setStrokeWidth(thickness);
+        setStroke(color);
         stations = FXCollections.observableArrayList();
-        stations.addAll(start, end);
-        connectStations();
-    }
-    
-    public void connectStations(){
-        lines.clear();
-        ObservableList<DraggableCircle> temp = FXCollections.observableArrayList();
-        for (DraggableCircle c : stations){
-            temp.add(c);
-        }
-        for (DraggableCircle c : temp){
-            DraggableCircle closest = new DraggableCircle();
-            double closestDistance = 10000;
-            for (DraggableCircle k : temp){
-                double tempDistance = Math.sqrt(Math.pow((c.getCenterX() - k.getCenterX()), 2) + 
-                        Math.pow((c.getCenterY() - k.getCenterY()), 2));
-                if (tempDistance < closestDistance){
-                    closestDistance = tempDistance;
-                    closest = k;
-                }
-            }
-            Line line = new Line();
-            line.setStroke(color);
-            line.setStrokeWidth(thickness);
-            line.startXProperty().bind(c.centerXProperty());
-            line.startYProperty().bind(c.centerYProperty());
-            line.endXProperty().bind(closest.centerXProperty());
-            line.endYProperty().bind(closest.centerYProperty());
-            lines.add(line);
-        }
-            
-    }
-    
-    public MetroLine makeClone() {
-        MetroLine cloneLine = new MetroLine(thickness, color);
-        PropertiesManager props = PropertiesManager.getPropertiesManager();
-        for (DraggableCircle c : stations)
-            cloneLine.addStation(c);
-        return cloneLine;
+        stationNames = new ArrayList<>();
     }
     
     public void setThickness(double thickness){
@@ -79,13 +53,76 @@ public class MetroLine {
         return thickness;
     }
     
-    public void addStation(DraggableCircle metroStation){
-        stations.add(metroStation);
-        connectStations();
+    public void addStation(MetroStation metroStation){
+        if (!(stations.contains(metroStation))){
+            double distance = 100000;
+            double x = metroStation.getX();
+            double y = metroStation.getY();
+            int shortestind = 0;
+            for (int i = 0; i < getPoints().size() - 3; i+=2){
+                double temp = Math.sqrt((Math.pow((getPoints().get(i) - x), 2)) + 
+                        Math.pow((getPoints().get(i + 1) - y), 2)) + 
+                        Math.sqrt((Math.pow((getPoints().get(i + 2) - x), 2)) + 
+                        Math.pow((getPoints().get(i + 3) - y), 2));
+                if (temp < distance){
+                    shortestind = i;
+                    distance = temp;
+                }
+            }
+            int i = shortestind / 2;
+            stationNames.add(i, metroStation.getAssociatedLabel().getText());
+            stations.add(i, metroStation);
+            getPoints().add(shortestind + 2, metroStation.getX() + metroStation.getRadius());
+            getPoints().add(shortestind + 3, metroStation.getY() + metroStation.getRadius());
+            metroStation.addLine(this);
+        }
     }
     
-    public void removeStation(DraggableCircle metroStation){
-        stations.remove(metroStation);
-        connectStations();
+    public void removeStation(MetroStation metroStation){
+        if (stations.contains(metroStation)) {
+            stations.remove(metroStation);
+            int i = stationNames.indexOf(metroStation.getAssociatedLabel().getText());
+            getPoints().remove(metroStation.getX() + metroStation.getRadius());
+            getPoints().remove(metroStation.getY() + metroStation.getRadius());
+            stationNames.remove(metroStation.getAssociatedLabel().getText());
+            metroStation.removeLine(this);
+        }
+    }
+    
+    public String getNodeType(){
+        return LINE;
+    }
+    
+    public DraggableText getAssociatedStartLabel(){
+        return startLabel;
+    }
+    
+    public DraggableText getAssociatedEndLabel(){
+        return endLabel;
+    }
+    
+    public void setAssociatedStartLabel(DraggableText start){
+        startLabel = start;
+    }
+    
+    public void setAssociatedEndLabel(DraggableText end){
+        endLabel = end;
+    }
+    
+    public void editName(String name){
+        endLabel.setText(name);
+        startLabel.setText(name);
+    }
+    
+    public void setColor(Paint color){
+        setStroke(color);
+    }
+    
+    public Paint getColor(){
+        return getStroke();
+    }
+    
+    public ArrayList<String> getStationNames(){
+        return stationNames;
     }
 }
