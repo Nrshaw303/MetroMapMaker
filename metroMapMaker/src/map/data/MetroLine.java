@@ -1,6 +1,7 @@
 package map.data;
 
 import java.util.ArrayList;
+import javafx.beans.property.DoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventType;
@@ -60,10 +61,9 @@ public class MetroLine extends Polyline{
             double y = metroStation.getY();
             int shortestind = 0;
             for (int i = 0; i < getPoints().size() - 3; i+=2){
-                double temp = Math.sqrt((Math.pow((getPoints().get(i) - x), 2)) + 
-                        Math.pow((getPoints().get(i + 1) - y), 2)) + 
-                        Math.sqrt((Math.pow((getPoints().get(i + 2) - x), 2)) + 
-                        Math.pow((getPoints().get(i + 3) - y), 2));
+                double midpointX = (getPoints().get(i) + getPoints().get(i + 2)) / 2;
+                double midpointY = (getPoints().get(i + 1) + getPoints().get( i + 3)) / 2;
+                double temp = Math.sqrt((Math.pow(midpointX - x, 2)) + Math.pow(midpointY - y, 2));
                 if (temp < distance){
                     shortestind = i;
                     distance = temp;

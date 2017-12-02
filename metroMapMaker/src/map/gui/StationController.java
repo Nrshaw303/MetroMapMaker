@@ -60,6 +60,20 @@ public class StationController {
         
         if (result.get() == ButtonType.OK){
             String stationName = name.getText();
+            for (int i = 0; i < mapManager.getMapNodes().size(); i++){
+                if (mapManager.getMapNodes().get(i) instanceof MetroStation){
+                    if (((MetroStation) mapManager.getMapNodes().get(i)).getAssociatedLabel().getText().equals(stationName)){
+                        Dialog popup = new Dialog();
+                        popup.setHeaderText("Station name already exists");
+                        popup.setTitle("Station creation error");
+                        popup.getDialogPane().getButtonTypes().add(ButtonType.OK);
+                        
+                        popup.showAndWait();
+                        
+                        return;
+                    }
+                }
+            }
             mapManager.startNewStation(100, 100, stationName);
         }
     }

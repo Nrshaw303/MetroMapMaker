@@ -209,11 +209,9 @@ public class CanvasController {
                     label.getAssociatedStation().setCenterY(label.getY() + 10);
                     if (!(label.getAssociatedStation().getLines().isEmpty())) {
                         for (MetroLine m : label.getAssociatedStation().getLines()) {
-                            m.getPoints().remove(m.getStationNames().indexOf(label.getText()) * 2 + 2);
-                            m.getPoints().add(m.getStationNames().indexOf(label.getText()) * 2 + 2, 
+                            m.getPoints().set(m.getStationNames().indexOf(label.getText()) * 2 + 2, 
                                     label.getAssociatedStation().getX() + label.getAssociatedStation().getRadius());
-                            m.getPoints().remove(m.getStationNames().indexOf(label.getText()) * 2 + 3);
-                            m.getPoints().add(m.getStationNames().indexOf(label.getText()) * 2 + 3, 
+                            m.getPoints().set(m.getStationNames().indexOf(label.getText()) * 2 + 3, 
                                     label.getAssociatedStation().getY() + label.getAssociatedStation().getRadius());
 
                         }
