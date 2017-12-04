@@ -466,7 +466,13 @@ public class mapWorkspace extends AppWorkspaceComponent {
 	app.getGUI().getWindow().setOnCloseRequest(i ->{
             ButtonType sellection = AppDialogs.showYesNoCancelDialog(app.getGUI().getWindow(), SAVE_VERIFY_TITLE, SAVE_VERIFY_CONTENT);
             if (sellection == ButtonType.YES) {
-                i.consume();
+                try{
+                app.getGUI().getFileController().processSaveRequest();
+                app.getGUI().getWindow().close();
+                }
+                catch(Exception e){
+                    
+                }
             } 
             else if (sellection == ButtonType.NO) {
                 app.getGUI().getWindow().close();
@@ -718,5 +724,13 @@ public class mapWorkspace extends AppWorkspaceComponent {
                 return s;
         }
         return null;
+    }
+    
+    public ObservableList<String> getListOfStationNames(){
+        return stationNames;
+    }
+    
+    public ObservableList<String> getListOfLineNames(){
+        return lineNames;
     }
 }

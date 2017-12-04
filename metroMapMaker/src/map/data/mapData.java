@@ -111,6 +111,10 @@ public class mapData implements AppDataComponent {
 	mapNodes.clear();
 	((mapWorkspace)app.getWorkspaceComponent()).getCanvas().getChildren().clear();
         ((mapWorkspace)app.getWorkspaceComponent()).initDebugText();
+        ((mapWorkspace)app.getWorkspaceComponent()).getListOfLines().clear();
+        ((mapWorkspace)app.getWorkspaceComponent()).getListOfStations().clear();
+        ((mapWorkspace)app.getWorkspaceComponent()).getListOfLineNames().clear();
+        ((mapWorkspace)app.getWorkspaceComponent()).getListOfStationNames().clear();
     }
     
     public Color getBackgroundColor() {

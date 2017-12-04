@@ -3,10 +3,9 @@ package map;
 import java.util.Locale;
 
 import map.data.mapData;
-//import map.file.mapFiles;
+import map.file.mapFiles;
 import map.gui.mapWorkspace;
 import djf.AppTemplate;
-//import map.gui.mapClipboard;
 
 /**
  * This class serves as the application class for our goLogoLoApp program. Note that much of its behavior is inherited
@@ -31,10 +30,9 @@ public class metroMapMakerApp extends AppTemplate {
         // THE WORKSPACE NEEDS THE DATA COMPONENT TO EXIST ALREADY
         // WHEN IT IS CONSTRUCTED, AND THE DATA COMPONENT NEEDS THE
         // FILE COMPONENT SO WE MUST BE CAREFUL OF THE ORDER
-//        fileComponent = new mapFiles();
+        fileComponent = new mapFiles(this);
         dataComponent = new mapData(this);
         workspaceComponent = new mapWorkspace(this);
-//        clipboardComponent = new mapClipboard(this);
     }
 
     /**

@@ -70,7 +70,7 @@ public class MetroLine extends Polyline{
                 }
             }
             int i = shortestind / 2;
-            stationNames.add(i, metroStation.getAssociatedLabel().getText());
+            addStationNameToList(i, metroStation.getAssociatedLabel().getText());
             stations.add(i, metroStation);
             getPoints().add(shortestind + 2, metroStation.getX() + metroStation.getRadius());
             getPoints().add(shortestind + 3, metroStation.getY() + metroStation.getRadius());
@@ -124,5 +124,21 @@ public class MetroLine extends Polyline{
     
     public ArrayList<String> getStationNames(){
         return stationNames;
+    }
+    
+    //USED FOR FILE LOADING
+    public void addStationName(String name){
+        stationNames.add(name);
+    }
+    
+    //NEEDED FOR FILE LOADING
+    public void addStationNameToList(int i, String stationName){
+        for (String name : stationNames){
+            //IF THE STATION NAME IS ALREADY IN THE LIST (ONLY POSSIBLE DURING LOADING)
+            if (stationName.equals(name)){
+                return;
+            }
+        }
+        stationNames.add(i, stationName);
     }
 }

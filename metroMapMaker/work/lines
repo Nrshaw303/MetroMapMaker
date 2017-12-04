@@ -1,0 +1,39 @@
+
+{
+    "lines":[
+        {
+            "name":"ghju",
+            "start_x":510.0,
+            "start_y":114.0,
+            "end_x":903.0,
+            "end_y":553.0,
+            "thickness":5.0,
+            "color":{
+                "red":0.20000000298023224,
+                "green":0.0,
+                "blue":0.20000000298023224,
+                "alpha":1.0
+            },
+            "station_names":[
+            ]
+        },
+        {
+            "name":"pp",
+            "start_x":832.0,
+            "start_y":160.0,
+            "end_x":689.0,
+            "end_y":623.0,
+            "thickness":5.0,
+            "color":{
+                "red":1.0,
+                "green":1.0,
+                "blue":0.6000000238418579,
+                "alpha":1.0
+            },
+            "station_names":[
+            ]
+        }
+    ],
+    "stations":[
+    ]
+}
