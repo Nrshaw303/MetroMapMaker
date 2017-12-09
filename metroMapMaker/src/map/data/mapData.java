@@ -18,6 +18,7 @@ import djf.AppTemplate;
 import javafx.collections.FXCollections;
 import static javafx.scene.paint.Color.rgb;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
 import static map.data.mapState.*;
 import javafx.scene.text.Text;
 import jtps.jTPS;
@@ -38,9 +39,10 @@ public class mapData implements AppDataComponent {
     ObservableList<Node> mapNodes;
     ObservableList<Line> gridLines;
     Boolean hasGridLines = false;
+    Boolean showingGridlines = false;
         
     // THIS IS THE SHAPE CURRENTLY BEING SIZED BUT NOT YET ADDED
-    Shape newShape;
+    Node newShape;
 
     // THIS IS THE NODE CURRENTLY SELECTED
     Node selectedNode;
@@ -146,6 +148,15 @@ public class mapData implements AppDataComponent {
     public void highlightNode(Node node) {
 	node.setEffect(highlightedEffect);
     }
+    
+    public void startNewLabel(int x, int y, String text){
+        DraggableText label = new DraggableText(text);
+        Font font = ((mapWorkspace) app.getWorkspaceComponent()).getCurrentFontSettings();
+        label.start(x, y);
+        newShape = label;
+        label.setFont(font);
+        initNewShape();
+    }
 
     public void startNewStation(int x, int y, String name) {
         DraggableText label = new DraggableText(name);
@@ -217,7 +228,7 @@ public class mapData implements AppDataComponent {
         tps.addTransaction(newTransaction);
     }
 
-    public Shape getNewShape() {
+    public Node getNewShape() {
 	return newShape;
     }
 
@@ -315,7 +326,7 @@ public class mapData implements AppDataComponent {
         if (selectedNode == null)
             return false;
         else
-            return (selectedNode instanceof Text);
+            return (selectedNode instanceof DraggableText);
     }
     
     public void showGridLines(){
@@ -331,16 +342,18 @@ public class mapData implements AppDataComponent {
         }
         mapNodes.addAll(0, gridLines);
         hasGridLines = true;
+        showingGridlines = true;
     }
     
     public void hideGridLines(){
         if (hasGridLines){
             mapNodes.removeAll(gridLines);
+            showingGridlines = false;
         }
     }
     
     public void updateGridLines(){
-        if (hasGridLines){
+        if (hasGridLines && showingGridlines){
             hideGridLines();
             showGridLines();
         }

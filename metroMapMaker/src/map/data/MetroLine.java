@@ -1,15 +1,30 @@
 package map.data;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventType;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Shape;
+import javafx.scene.text.Text;
 import static map.data.Draggable.LINE;
 import properties_manager.PropertiesManager;
 
@@ -31,6 +46,7 @@ public class MetroLine extends Polyline{
     ObservableList<Line> lines;
     DraggableText startLabel;
     DraggableText endLabel;
+    Boolean isCircular = false;
     
     public MetroLine() {
         lines = FXCollections.observableArrayList();
@@ -87,6 +103,68 @@ public class MetroLine extends Polyline{
             stationNames.remove(metroStation.getAssociatedLabel().getText());
             metroStation.removeLine(this);
         }
+    }
+    
+    public void getEditLineDialog() {
+
+        Dialog dialog = new Dialog();
+        dialog.setHeaderText("Choose a name and a color for new line:");
+        dialog.setTitle("New Line");
+
+        VBox dialogVBox = new VBox();
+        HBox nameHBox = new HBox();
+        HBox colorHBox = new HBox();
+
+        ColorPicker color = new ColorPicker((Color) this.getColor());
+        Label label1 = new Label("Line Name:");
+        TextField name = new TextField(this.getAssociatedStartLabel().getText());
+        Label label2 = new Label("Line Color");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Region spacer2 = new Region();
+        HBox.setHgrow(spacer2, Priority.ALWAYS);
+
+        nameHBox.getChildren().addAll(label1, spacer, name);
+        colorHBox.getChildren().addAll(label2, spacer2, color);
+        dialogVBox.getChildren().addAll(nameHBox, colorHBox, new CheckBox());
+        dialogVBox.setSpacing(15);
+        dialog.getDialogPane().setContent(dialogVBox);
+
+        ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().addAll(cancelButtonType, ButtonType.OK);
+
+        Optional<ButtonType> result = dialog.showAndWait();
+
+        if (result.get() == ButtonType.OK) {
+            setColor(color.getValue());
+            editName(name.getText());
+        }
+    }
+    
+    public void getListOfStationsDialog(){
+        
+        Dialog dialog = new Dialog();
+        dialog.setHeaderText("List of stations on line " + getAssociatedStartLabel().getText() + ":");
+        dialog.setTitle("Station List");
+
+        VBox dialogVBox = new VBox();
+        
+        String list = "";
+        
+        for (int i = stationNames.size() - 1; i >= 0; i--){
+            list += "• " + stationNames.get(i) + "\n";
+        }
+        
+        Text text = new Text(list);
+
+        dialogVBox.getChildren().addAll(text);
+        dialogVBox.setAlignment(Pos.CENTER);
+        dialogVBox.setPadding(new Insets(20, 20, 20, 20));
+        dialog.getDialogPane().setContent(dialogVBox);
+
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+
+        dialog.showAndWait();
     }
     
     public String getNodeType(){

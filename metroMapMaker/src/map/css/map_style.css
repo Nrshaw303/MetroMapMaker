@@ -36,7 +36,7 @@ Nicholas Shaw
     -fx-text-fill: white;
     -fx-effect: dropshadow( three-pass-box , rgba(255,255,255,0.2) , 1, 0.0 , 0 , 1);
 }
-.button:hover, .color-picker:hover, .combo-box:hover, .toggle-button:hover {
+.button:hover, .color-picker:hover, .combo-box:hover, .toggle-button:hover, .toggle-button:selected{
     -fx-background-color: 
         linear-gradient(#686868 0%, #232723 25%, #373837 75%, #757575 100%),
         linear-gradient(#020b02, #3a3a3a),

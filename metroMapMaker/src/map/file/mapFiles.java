@@ -71,6 +71,7 @@ public class mapFiles implements AppFileComponent {
     static final String JSON_LABEL_X = "label_x";
     static final String JSON_LABEL_Y = "label_y";
     static final String JSON_LABEL_ROTATION = "label_rotation";
+    static final String JSON_CIRCULAR = "circular";
     static final String JSON_RADIUS = "radius";
     static final String JSON_THICKNESS = "thickness";
     static final String JSON_COLOR = "color";
@@ -132,6 +133,7 @@ public class mapFiles implements AppFileComponent {
                         .add(JSON_NAME, name)
                         .add(JSON_START_X, startX)
                         .add(JSON_START_Y, startY)
+                        .add(JSON_CIRCULAR, 0)
                         .add(JSON_END_X, endX)
                         .add(JSON_END_Y, endY)
                         .add(JSON_THICKNESS, width)
