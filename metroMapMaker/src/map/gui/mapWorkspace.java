@@ -46,6 +46,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -60,12 +61,19 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import static javafx.scene.paint.Color.rgb;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import jtps.jTPS;
+import map.data.DraggableImage;
+import map.data.DraggableText;
 import map.data.MetroLine;
 import map.data.MetroStation;
+import map.transactions.ChangeBackgroundColor_Transaction;
+import map.transactions.ChangeShapeOutlineThickness_Transaction;
+import map.transactions.ChangeShapeRadius_Transaction;
 import properties_manager.PropertiesManager;
 
 /**
@@ -97,7 +105,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
     Button stationsAsListButton;
     Text metroLinesText;
     ComboBox metroLinesComboBox;
-    ColorPicker lineColorPicker;
+    Button editLineButton;
     Slider lineWidthSlider;
     Region linesSpacer;
     
@@ -163,6 +171,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
     Group zoomGroup;
     Group canvasGroup;
     ScrollPane scrollPane;
+    double panCounterX;
+    double panCounterY;
     
     BackgroundImage backgroundImage;
     
@@ -217,10 +227,6 @@ public class mapWorkspace extends AppWorkspaceComponent {
     
     // ACCESSOR METHODS FOR COMPONENTS THAT EVENT HANDLERS
     // MAY NEED TO UPDATE OR ACCESS DATA FROM
-    
-    public ColorPicker getLineColorPicker() {
-	return lineColorPicker;
-    }
     
     public ColorPicker getStationColorPicker() {
 	return stationColorPicker;
@@ -286,12 +292,13 @@ public class mapWorkspace extends AppWorkspaceComponent {
         metroLinesComboBox.setMaxWidth(100);
         metroLinesText = new Text("Metro Lines");
         metroLinesText.getStyleClass().add("labels");
-        lineColorPicker = new ColorPicker();
+        editLineButton = new Button("Edit Line");
+        editLineButton.setMaxHeight(MAX_VALUE);
         lineWidthSlider = new Slider();
         linesTopPane.setId("metro-line");
         linesSpacer = new Region();
         HBox.setHgrow(linesSpacer, Priority.ALWAYS);
-        linesTopPane.getChildren().addAll(metroLinesText, linesSpacer, metroLinesComboBox, lineColorPicker);
+        linesTopPane.getChildren().addAll(metroLinesText, linesSpacer, metroLinesComboBox, editLineButton);
         linesMiddlePane.getChildren().addAll(addLineButton, removeLineButton, addStationToLineButton, removeStationToLineButton, stationsAsListButton);
         linesPane.getChildren().addAll(linesTopPane, linesMiddlePane, lineWidthSlider);
         editToolbar.getChildren().add(linesPane);
@@ -422,7 +429,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         canvas.getChildren().add(debugText);
 	debugText.setX(500);
 	debugText.setY(500);
-	
+        
 	// AND MAKE SURE THE DATA MANAGER IS IN SYNCH WITH THE PANE
         mapData data = (mapData)app.getDataComponent();
 	data.setMapNodes(canvas.getChildren());
@@ -488,7 +495,28 @@ public class mapWorkspace extends AppWorkspaceComponent {
         CanvasController canvasController = new CanvasController(app);
         mapData mapManager = (mapData) app.getDataComponent();
         AddImageController imageController = new AddImageController(app);
+        FontController fontController = new FontController(app);
         
+        scrollPane.setOnKeyPressed(i ->{
+            switch(i.getCode()){
+                case W:
+                    panCounterY += 25;
+                    canvasGroup.translateYProperty().set(panCounterY);
+                    break;
+                case A:
+                    panCounterX += 25;
+                    canvasGroup.translateXProperty().set(panCounterX);
+                    break;
+                case S:
+                    panCounterY -= 25;
+                    canvasGroup.translateYProperty().set(panCounterY);
+                    break;
+                case D:
+                    panCounterX -= 25;
+                    canvasGroup.translateXProperty().set(panCounterX);
+                    break;
+            }
+        });        
 	app.getGUI().getWindow().setOnCloseRequest(i ->{
             ButtonType sellection = AppDialogs.showYesNoCancelDialog(app.getGUI().getWindow(), SAVE_VERIFY_TITLE, SAVE_VERIFY_CONTENT);
             if (sellection == ButtonType.YES) {
@@ -530,10 +558,35 @@ public class mapWorkspace extends AppWorkspaceComponent {
         addStationButton.setOnAction(i ->{
             stationController.addStation();
         });
-        lineColorPicker.setOnAction(i ->{
-            if (mapManager.getSelectedNode() instanceof MetroLine){
-                ((MetroLine) mapManager.getSelectedNode()).setColor(lineColorPicker.getValue());
+        editLineButton.setOnAction(i ->{
+            if (listOfLines.size() == 0){
+                i.consume();
             }
+            else{
+                MetroLine line = listOfLines.get(metroLinesComboBox.getSelectionModel().getSelectedIndex());
+                line.getEditLineDialog();
+            }
+        });
+        stationsAsListButton.setOnAction(i ->{
+            if (listOfLines.size() == 0){
+                i.consume();
+            }
+            else{
+                MetroLine line = listOfLines.get(metroLinesComboBox.getSelectionModel().getSelectedIndex());
+                line.getListOfStationsDialog();
+            }
+        });
+        stationColorPicker.setOnAction(i ->{
+            if (listOfStations.size() == 0){
+                i.consume();
+            }
+            else{
+                MetroStation station = listOfStations.get(metroStationsComboBox.getSelectionModel().getSelectedIndex());
+                station.setFill(stationColorPicker.getValue());
+            }
+        });
+        metroLinesComboBox.setOnAction(i ->{
+            mapManager.setSelectedNode(listOfLines.get(metroLinesComboBox.getSelectionModel().getSelectedIndex()));
         });
         removeStationButton.setOnAction(i -> {
             stationController.removeStation();
@@ -543,6 +596,56 @@ public class mapWorkspace extends AppWorkspaceComponent {
         });
         moveLabelButton.setOnAction(i -> {
             stationController.moveLabel(mapManager.getSelectedNode());
+        });
+        rotateLabelButton.setOnAction(i ->{
+            if (mapManager.getSelectedNode() instanceof MetroStation || mapManager.getSelectedNode() instanceof DraggableText){
+                if (mapManager.getSelectedNode() instanceof MetroStation){
+                    stationController.rotateLabel(mapManager.getSelectedNode());
+                }
+                else if (((DraggableText) mapManager.getSelectedNode()).getIsForLine()){
+                    stationController.rotateLabel(mapManager.getSelectedNode());
+                }
+            }
+        });
+        decoreColorPicker.setOnAction(i -> {
+            canvas.setBackground(new Background(new BackgroundFill(decoreColorPicker.getValue(), null, null)));
+            jTPS jtps = app.getTPS();
+            ChangeBackgroundColor_Transaction transaction = new ChangeBackgroundColor_Transaction(canvas, decoreColorPicker.getValue());
+            jtps.addTransaction(transaction);
+            
+        });
+        lineWidthSlider.valueProperty().addListener(i ->{
+            if (mapManager.getSelectedNode() instanceof MetroLine){
+                ((MetroLine) mapManager.getSelectedNode()).setThickness(lineWidthSlider.getValue());
+                jTPS jtps = app.getTPS();
+                ChangeShapeOutlineThickness_Transaction transaction = new ChangeShapeOutlineThickness_Transaction((MetroLine) 
+                        mapManager.getSelectedNode(), lineWidthSlider.getValue());
+                jtps.addTransaction(transaction);
+            }
+        });
+        stationRadiusSlider.valueProperty().addListener(i ->{
+            if (mapManager.getSelectedNode() instanceof MetroStation){
+                ((MetroStation) mapManager.getSelectedNode()).setRadius(stationRadiusSlider.getValue());
+                jTPS jtps = app.getTPS();
+                ChangeShapeRadius_Transaction transaction = new ChangeShapeRadius_Transaction((MetroStation) 
+                        mapManager.getSelectedNode(), stationRadiusSlider.getValue());
+                jtps.addTransaction(transaction);
+            }
+        });
+        fontSizeComboBox.setOnAction(i ->{
+            fontController.processChangeFont();
+        });
+        fontFamilyComboBox.setOnAction(i ->{
+            fontController.processChangeFont();
+        });
+        fontColorColorPicker.setOnAction(i ->{
+            fontController.processChangeFont();
+        });
+        boldButton.setOnAction(i ->{
+            fontController.processChangeFont();
+        });
+        italicsButton.setOnAction(i ->{
+            fontController.processChangeFont();
         });
         zoomInButton.setOnAction(i ->{
             canvasController.processZoomInRequest(zoomGroup);
@@ -584,11 +687,25 @@ public class mapWorkspace extends AppWorkspaceComponent {
                     }
                 }
                 ArrayList<MetroStation> solution = stationController.findRoute(startStation, endStation);
-                if (!solution.isEmpty()){
-                    for (MetroStation station : solution){
-                        System.out.println(station.getAssociatedLabel().getText());
-                    }
+                Dialog dialog = new Dialog();
+                
+                dialog.setTitle("Shortest Route");
+                dialog.setHeaderText("Shortest Route from " + startStation.getAssociatedLabel().getText() + 
+                        " and " + endStation.getAssociatedLabel().getText());
+                
+                String sol = "";
+                
+                for (int j = 0; j < solution.size(); j++){
+                    sol += "• " + solution.get(j).getAssociatedLabel().getText() + "\n";
                 }
+                
+                VBox dialogVBox = new VBox(new Text(sol));
+                dialogVBox.setAlignment(Pos.CENTER);
+                dialogVBox.setPadding(new Insets(20, 20, 20, 20));
+                
+                dialog.getDialogPane().setContent(dialogVBox);
+                dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+                dialog.showAndWait();
             }
         });
         setImageBackgroundButton.setOnAction(i ->{
@@ -598,6 +715,22 @@ public class mapWorkspace extends AppWorkspaceComponent {
         });
         addImageButton.setOnAction(i ->{
             imageController.processAddImage();
+        });
+        addLabelButton.setOnAction(i ->{
+            stationController.addLabel();
+        });
+        removeElementButton.setOnAction(i ->{
+            Node node = mapManager.getSelectedNode();
+            if (node instanceof DraggableImage || node instanceof DraggableText){
+                if (node instanceof DraggableText){
+                    if (!((DraggableText) node).getIsForLine() && !((DraggableText) node).getIsForStation()){
+                        mapManager.removeNode(node);
+                    }
+                }
+                else{
+                    mapManager.removeNode(node);
+                }
+            }
         });
 	canvas.setOnMousePressed(e->{
 	    canvasController.processCanvasMousePress((int)e.getX(), (int)e.getY(), e.getClickCount());
@@ -612,66 +745,6 @@ public class mapWorkspace extends AppWorkspaceComponent {
             SnapshotController snapshotController = new SnapshotController(app);
             snapshotController.processSnapshot(app.getGUI().getFileController().processExportRequest());
         });
-        
-//        // THEN THE ADD IMAGE AND TEXT TOOLBAR
-//        AddImageAndTextController addImageAndTextController = new AddImageAndTextController(app);
-//        addImageButton.setOnAction(e->{
-//            addImageAndTextController.processAddImage();
-//        });
-//        addTextButton.setOnAction(e->{
-//            addImageAndTextController.processAddText();
-//        });
-
-        // AND THEN THE FONT TOOLBAR
-        FontController fontController = new FontController(app);
-//        fontFamilyComboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener(){
-//            @Override
-//            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-//                fontController.processChangeFont();
-//            }
-//        });
-//        fontSizeComboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener(){
-//            @Override
-//            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-//                fontController.processChangeFont();
-//            }
-//        });
-//        boldButton.setOnAction(e->{
-//            fontController.processChangeFont();
-//        });
-//        italicsButton.setOnAction(e->{
-//            fontController.processChangeFont();
-//        });
-	
-//        // AND THE LAYER TOOLBAR
-//        LayerController layerController = new LayerController(app);
-//	moveToBackButton.setOnAction(e->{
-//	    layerController.processMoveSelectedNodeToBack();
-//	});
-//	moveToFrontButton.setOnAction(e->{
-//	    layerController.processMoveSelectedNodeToFront();
-//	});
-//
-//        // THE BACKGROUND TOOLBAR
-//        BackgroundOutlineFillController backgroundOutlineFillController = new BackgroundOutlineFillController(app);
-//	backgroundColorPicker.setOnAction(e->{
-//	    backgroundOutlineFillController.processSelectBackgroundColor();
-//	});
-//	fillColorPicker.setOnAction(e->{ 
-//	    backgroundOutlineFillController.processSelectFillColor();
-//	});
-//	outlineColorPicker.setOnAction(e->{
-//	    backgroundOutlineFillController.processSelectOutlineColor();
-//	});
-//	outlineThicknessSlider.valueProperty().addListener(e-> {
-//	    backgroundOutlineFillController.processSelectOutlineThickness();
-//	});
-//        
-//        // AND THE SNAPSHOT TOOLBAR
-//        SnapshotController snapshotController = new SnapshotController(app);
-//	snapshotButton.setOnAction(e->{
-//	    snapshotController.processSnapshot();
-//	});
     }
 
     // HELPER METHOD
@@ -686,8 +759,6 @@ public class mapWorkspace extends AppWorkspaceComponent {
                     if (shape instanceof MetroLine) {
                         lineWidthSlider.setValue(((MetroLine) shape).getThickness());
                     }
-                    lineColorPicker.setValue(lineColor);
-                    stationColorPicker.setValue(stationColor);
                 }
             }
 	}
@@ -750,16 +821,22 @@ public class mapWorkspace extends AppWorkspaceComponent {
         
     }
     
-//    public Font getCurrentFontSettings() {
-////        String fontFamily = fontFamilyComboBox.getSelectionModel().getSelectedItem().toString();
-////        int fontSize = Integer.valueOf(fontSizeComboBox.getSelectionModel().getSelectedItem().toString());
-////        FontWeight weight = FontWeight.NORMAL;
-////        if (boldButton.isPressed()) weight = FontWeight.BOLD;
-////        FontPosture posture = FontPosture.REGULAR;
-////        if (italicsButton.isPressed()) posture = FontPosture.ITALIC;
-////        Font newFont = Font.font(fontFamily, fontSize);
-////        return newFont;
-//    }
+    public Font getCurrentFontSettings() {
+        String fontFamily = fontFamilyComboBox.getSelectionModel().getSelectedItem().toString();
+        int fontSize = Integer.valueOf(fontSizeComboBox.getSelectionModel().getSelectedItem().toString());
+        FontWeight weight = FontWeight.NORMAL;
+        if (boldButton.isSelected())
+            weight = FontWeight.BOLD;
+        FontPosture posture = FontPosture.REGULAR;
+        if (italicsButton.isSelected())
+            posture = FontPosture.ITALIC;
+        Font newFont = Font.font(fontFamily, weight, posture, fontSize);
+        return newFont;
+    }
+    
+    public Paint getFontColor(){
+        return fontColorColorPicker.getValue();
+    }
 
     public String getRequestType(){
         return requestType;
@@ -831,5 +908,21 @@ public class mapWorkspace extends AppWorkspaceComponent {
     
     public ScrollPane getCanvasScrollPane(){
         return scrollPane;
+    }
+    
+    public ComboBox getMetroLinesComboBox(){
+        return metroLinesComboBox;
+    }
+    
+    public ComboBox getMetroStationsComboBox(){
+        return metroStationsComboBox;
+    }
+    
+    public Slider getLineWidthSlider(){
+        return lineWidthSlider;
+    }
+    
+    public Slider getStationRadiusSlider(){
+        return stationRadiusSlider;
     }
 }

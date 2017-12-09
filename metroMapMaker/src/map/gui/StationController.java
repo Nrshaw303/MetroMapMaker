@@ -116,7 +116,18 @@ public class StationController {
     }
 
     public void rotateLabel(Node node) {
-
+        if (node instanceof MetroStation){
+            if (((MetroStation) node).getAssociatedLabel().getRotate() == 0)
+                ((MetroStation) node).getAssociatedLabel().setRotate(90);
+            else
+                ((MetroStation) node).getAssociatedLabel().setRotate(0);
+        }
+        else{
+            if (((DraggableText) node).getRotate() == 0)
+                ((DraggableText) node).setRotate(90);
+            else
+                ((DraggableText) node).setRotate(0);
+        }
     }
     
     public void snapToGrid(Node node){
@@ -204,19 +215,19 @@ public class StationController {
         for (int i = 0; i < stations.size(); i++){
             solMatrix[i][i] = 0;
         }
-        System.out.println("Solution Matrix");
-        System.out.print("[ ] ");
-        for (int i = 0; i < stations.size(); i++){
-            System.out.print("[" + stations.get(i).getAssociatedLabel().getText() + "] ");
-        }
-        System.out.println();
-        for (int i = 0; i < stations.size(); i++){
-            System.out.print("[" + stations.get(i).getAssociatedLabel().getText() + "] ");
-            for (int j = 0; j < stations.size(); j++){
-                System.out.print("[" + solMatrix[i][j] + "] ");
-            }
-            System.out.println();
-        }
+//        System.out.println("Solution Matrix");
+//        System.out.print("[ ] ");
+//        for (int i = 0; i < stations.size(); i++){
+//            System.out.print("[" + stations.get(i).getAssociatedLabel().getText() + "] ");
+//        }
+//        System.out.println();
+//        for (int i = 0; i < stations.size(); i++){
+//            System.out.print("[" + stations.get(i).getAssociatedLabel().getText() + "] ");
+//            for (int j = 0; j < stations.size(); j++){
+//                System.out.print("[" + solMatrix[i][j] + "] ");
+//            }
+//            System.out.println();
+//        }
         ArrayList<ArrayList<MetroStation>> possibleSolutions = new ArrayList<>();
         int startIndex = stations.indexOf(startStation);
         int endIndex = stations.indexOf(endStation);
@@ -266,5 +277,33 @@ public class StationController {
             }
         }
         return null;
+    }
+    
+    public void addLabel(){
+        Dialog dialog = new Dialog();
+        dialog.setHeaderText("Choose content of new label:");
+        dialog.setTitle("New Label");
+        
+        VBox dialogVBox = new VBox();
+        HBox nameHBox = new HBox();
+        
+        Label label1 = new Label("Text:");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        TextField name = new TextField();
+        
+        nameHBox.getChildren().addAll(label1, spacer, name);
+        dialogVBox.getChildren().addAll(nameHBox);
+        dialog.getDialogPane().setContent(dialogVBox);
+        
+        ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().addAll(cancelButtonType, ButtonType.OK);
+        
+        Optional<ButtonType> result = dialog.showAndWait();
+        
+        if (result.get() == ButtonType.OK){
+            String text = name.getText();
+            mapManager.startNewLabel(100, 100, text);
+        }
     }
 }

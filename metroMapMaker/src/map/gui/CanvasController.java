@@ -10,21 +10,11 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import jtps.jTPS;
+import map.data.DraggableImage;
 import map.data.DraggableText;
 import map.data.MetroLine;
 import map.data.MetroStation;
@@ -108,44 +98,15 @@ public class CanvasController {
             Node node = dataManager.selectTopNode(x, y);
             Scene scene = app.getGUI().getPrimaryScene();
             
-            if (node instanceof MetroLine){
-                mapWorkspace.getLineColorPicker().setValue((Color)((MetroLine) node).getColor());
-            }
             if (mouseClicks > 1 && node instanceof MetroLine) {
-                Dialog dialog = new Dialog();
-                dialog.setHeaderText("Choose a name and a color for new line:");
-                dialog.setTitle("New Line");
-
-                VBox dialogVBox = new VBox();
-                HBox nameHBox = new HBox();
-                HBox colorHBox = new HBox();
-
-                ColorPicker color = new ColorPicker((Color)((MetroLine) node).getColor());
-                Label label1 = new Label("Line Name:");
-                TextField name = new TextField(((MetroLine) node).getAssociatedStartLabel().getText());
-                Label label2 = new Label("Line Color");
-                Region spacer = new Region();
-                HBox.setHgrow(spacer, Priority.ALWAYS);
-                Region spacer2 = new Region();
-                HBox.setHgrow(spacer2, Priority.ALWAYS);
-
-                nameHBox.getChildren().addAll(label1, spacer, name);
-                colorHBox.getChildren().addAll(label2, spacer2, color);
-                dialogVBox.getChildren().addAll(nameHBox, colorHBox);
-                dialogVBox.setSpacing(15);
-                dialog.getDialogPane().setContent(dialogVBox);
-
-                ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-                dialog.getDialogPane().getButtonTypes().addAll(cancelButtonType, ButtonType.OK);
-
-                Optional<ButtonType> result = dialog.showAndWait();
-
-                if (result.get() == ButtonType.OK) {
-                    String lineName = name.getText();
-                    Color lineColor = color.getValue();
-                    ((MetroLine) node).setColor(lineColor);
-                    ((MetroLine) node).editName(lineName);
-                }
+                MetroLine line = (MetroLine) node;
+                line.getEditLineDialog();
+            }
+            else if (node instanceof MetroLine){
+                mapWorkspace.getMetroLinesComboBox().getSelectionModel().select(((MetroLine) node).getAssociatedStartLabel().getText());
+            }
+            else if (node instanceof MetroStation){
+                mapWorkspace.getMetroStationsComboBox().getSelectionModel().select(((MetroStation) node).getAssociatedLabel().getText());
             }
             // AND START DRAGGING IT
             else if (node != null) {
@@ -153,9 +114,9 @@ public class CanvasController {
                 dataManager.setState(mapState.DRAGGING_NODE);
 
                 // STORE CURRENT POSSITION FOR UNDO/REDO
-                if (node instanceof DraggableText){
-                    currentOldX = ((DraggableText) node).getX();
-                    currentOldY = ((DraggableText) node).getY();
+                if (node instanceof DraggableText || node instanceof DraggableImage){
+                    currentOldX = ((Draggable) node).getX();
+                    currentOldY = ((Draggable) node).getY();
                 }
                 
                 app.getGUI().updateToolbarControls(false);
@@ -165,8 +126,6 @@ public class CanvasController {
                 app.getWorkspaceComponent().reloadWorkspace(dataManager);
             }
         }
-//        } else if (dataManager.isInState(mapState.STARTING_RECTANGLE)) {
-//            dataManager.startNewImage(x, y);
         mapWorkspace workspace = (mapWorkspace) app.getWorkspaceComponent();
         workspace.reloadWorkspace(dataManager);
     }
@@ -184,8 +143,12 @@ public class CanvasController {
                 DraggableText label = (DraggableText) selectedNode;
                 selectedDraggableNode.drag(x, y);
             
-                LineStationAndLabelUpdater labelUpdater = new LineStationAndLabelUpdater();
-                labelUpdater.updateLabelAssociations(label);
+                LineStationAndLabelUpdater updater = new LineStationAndLabelUpdater();
+                updater.updateLabelAssociations(label);
+            }
+            if (selectedNode instanceof DraggableImage){
+                Draggable selectedDraggableNode = (Draggable) dataManager.getSelectedNode();
+                selectedDraggableNode.drag(x, y);
             }
         }
     }
@@ -215,26 +178,26 @@ public class CanvasController {
     }
 
     public void processZoomInRequest(Group zoomGroup){
-        zoomCounter = zoomCounter + 0.25;
+        zoomCounter = zoomCounter + 0.1;
         zoomGroup.setScaleX(zoomCounter);
         zoomGroup.setScaleY(zoomCounter);
     }
     
     public void processZoomOutRequest(Group zoomGroup){
-        if (zoomCounter == 0.25)
+        if (zoomCounter == 0.1)
             return;
-        zoomCounter = zoomCounter - 0.25;        
+        zoomCounter = zoomCounter - 0.1;        
         zoomGroup.setScaleX(zoomCounter);
         zoomGroup.setScaleY(zoomCounter);
     }
     
     public void processIncreaseMapSizeRequest(Pane canvas){
-        canvas.setMaxSize(canvas.getWidth() * 1.25, canvas.getHeight() * 1.25);
+        canvas.setMaxSize(canvas.getWidth() * 1.1, canvas.getHeight() * 1.1);
     }
     
     public void processDecreaseMapSizeRequest(Pane canvas){
-        if (canvas.getHeight() * 0.75 < canvas.getMinHeight() || canvas.getWidth() * 0.75 < canvas.getMinWidth())
+        if (canvas.getHeight() * 0.9 < 200 || canvas.getWidth() * 0.9 < 200)
             return;
-        canvas.setMaxSize(canvas.getWidth() * 0.75, canvas.getHeight() * 0.75);
+        canvas.setMaxSize(canvas.getWidth() * 0.9, canvas.getHeight() * 0.9);
     }
 }

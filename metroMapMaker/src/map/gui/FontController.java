@@ -1,6 +1,7 @@
 package map.gui;
 
 import djf.AppTemplate;
+import javafx.scene.paint.Paint;
 import map.data.mapData;
 import map.transactions.ChangeTextFont_Transaction;
 import javafx.scene.text.Font;
@@ -18,15 +19,16 @@ public class FontController {
         app = initApp;
     }
 
-//    public void processChangeFont() {
-//        mapData data = (mapData)app.getDataComponent();
-//        if (data.isTextSelected()) {
-//            Text selectedText = (Text)data.getSelectedNode();
-//            mapWorkspace workspace = (mapWorkspace)app.getWorkspaceComponent();
-//            Font currentFont = workspace.getCurrentFontSettings();
-//            ChangeTextFont_Transaction transaction = new ChangeTextFont_Transaction(selectedText, currentFont);
-//            jTPS tps = app.getTPS();
-//            tps.addTransaction(transaction);
-//        }
-//    }
+    public void processChangeFont() {
+        mapData data = (mapData)app.getDataComponent();
+        if (data.isTextSelected()) {
+            Text selectedText = (Text)data.getSelectedNode();
+            mapWorkspace workspace = (mapWorkspace)app.getWorkspaceComponent();
+            Font currentFont = workspace.getCurrentFontSettings();
+            Paint color = workspace.getFontColor();
+            ChangeTextFont_Transaction transaction = new ChangeTextFont_Transaction(selectedText, currentFont, color);
+            jTPS tps = app.getTPS();
+            tps.addTransaction(transaction);
+        }
+    }
 }
