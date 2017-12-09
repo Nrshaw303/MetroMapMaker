@@ -24,11 +24,11 @@ public class SnapshotController {
      * This method processes a user request to take a snapshot of the
      * current scene.
      */
-    public void processSnapshot() {
+    public void processSnapshot(String fileName) {
 	mapWorkspace workspace = (mapWorkspace)app.getWorkspaceComponent();
 	Pane canvas = workspace.getCanvas();
 	WritableImage image = canvas.snapshot(new SnapshotParameters(), null);
-	File file = new File("Logo.png");
+	File file = new File(fileName + ".png");
 	try {
 	    ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
 	}

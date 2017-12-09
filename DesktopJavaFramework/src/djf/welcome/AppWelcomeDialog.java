@@ -133,7 +133,7 @@ public class AppWelcomeDialog implements AppWelcomeComponent{
     public void initControllers(){
         
         closeButton.setOnAction(i -> {
-            requestType = NEW_MAP_REQUEST;
+            requestType = NO_MAP_REQUEST;
             welcomeStage.close(); 
         });
         newWorkButton.setOnAction(i -> {

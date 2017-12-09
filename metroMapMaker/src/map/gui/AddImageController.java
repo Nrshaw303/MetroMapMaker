@@ -63,7 +63,7 @@ public class AddImageController {
         tps.addTransaction(transaction);        
     }
     
-    private Image promptForImage() {
+    public Image promptForImage() {
         // SETUP THE FILE CHOOSER FOR PICKING IMAGES
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("./images/"));

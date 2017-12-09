@@ -290,7 +290,6 @@ public class AppGUI {
         }
         if (isTrue(HAS_EXPORT)) {
             exportButton = initToolBarChildButton(fileToolbar, EXPORT_BUTTON_PREFIX, ENABLED);
-            exportButton.setOnAction(e -> fileController.processExportRequest());
         }
         if (isTrue(HAS_EXIT)) {
             exitButton = initToolBarChildButton(fileToolbar, EXIT_BUTTON_PREFIX, ENABLED);
@@ -487,5 +486,9 @@ public class AppGUI {
                 control.getStyleClass().add(CLASS_TOOLBAR_BUTTON);
             }
         }
+    }
+    
+    public Button getExportButton(){
+        return exportButton;
     }
 }

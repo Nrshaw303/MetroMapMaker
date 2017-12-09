@@ -19,6 +19,7 @@ public class DraggableText extends Text implements Draggable {
     boolean isForStation;
     MetroLine associatedLine = null;
     MetroStation associatedStation = null;
+    int movedProperty = 0;
     
     public DraggableText() {
 	setX(0.0);
@@ -89,12 +90,12 @@ public class DraggableText extends Text implements Draggable {
 
     @Override
     public double getWidth() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.getLayoutBounds().getWidth();
     }
 
     @Override
     public double getHeight() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.getLayoutBounds().getHeight() / 2;
     }
     
     public DraggableText duplicateText(){
@@ -158,5 +159,16 @@ public class DraggableText extends Text implements Draggable {
     
     public MetroLine getAssociatedLine(){
         return associatedLine;
+    }
+    
+    public void setMovedProperty(){
+        if (movedProperty == 3)
+            movedProperty = 0;
+        else
+            movedProperty++;
+    }
+    
+    public int getMovedProperty(){
+        return movedProperty;
     }
 }

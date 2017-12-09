@@ -7,6 +7,7 @@ import map.data.mapData;
 import map.data.mapState;
 import static map.data.mapState.*;
 import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonBar;
@@ -16,12 +17,18 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
+import jtps.jTPS;
 import map.data.DraggableText;
 import map.data.MetroLine;
 import map.data.MetroStation;
+import map.transactions.Move_Label_Transaction;
 
 /**
  *
@@ -30,6 +37,9 @@ import map.data.MetroStation;
 public class CanvasController {
     AppTemplate app;
     mapData dataManager;
+    double zoomCounter = 1;
+    double currentOldX;
+    double currentOldY;
 
     public CanvasController(AppTemplate initApp) {
 	app = initApp;
@@ -64,40 +74,7 @@ public class CanvasController {
 	mapWorkspace workspace = (mapWorkspace)app.getWorkspaceComponent();
 	workspace.reloadWorkspace(dataManager);
 	app.getGUI().updateToolbarControls(false);
-    }
-    
-    /**
-     * This method processes a user request to start drawing a rectangle.
-     */
-    public void processSelectRectangleToDraw() {
-	// CHANGE THE CURSOR
-	Scene scene = app.getGUI().getPrimaryScene();
-	scene.setCursor(Cursor.CROSSHAIR);
-	
-	// CHANGE THE STATE
-	dataManager.setState(mapState.STARTING_RECTANGLE);
-
-	// ENABLE/DISABLE THE PROPER BUTTONS
-	mapWorkspace workspace = (mapWorkspace)app.getWorkspaceComponent();
-	workspace.reloadWorkspace(dataManager);
-    }
-    
-    /**
-     * This method provides a response to the user requesting to start
-     * drawing an ellipse.
-     */
-//    public void processSelectEllipseToDraw() {
-//	// CHANGE THE CURSOR
-//	Scene scene = app.getGUI().getPrimaryScene();
-//	scene.setCursor(Cursor.CROSSHAIR);
-//	
-//	// CHANGE THE STATE
-//	dataManager.setState(mapState.STARTING_ELLIPSE);
-//
-//	// ENABLE/DISABLE THE PROPER BUTTONS
-//	mapWorkspace workspace = (mapWorkspace)app.getWorkspaceComponent();
-//	workspace.reloadWorkspace(dataManager);
-//    }    
+    }   
     
     /**
      * Respond to mouse presses on the rendering surface, which we call canvas,
@@ -107,6 +84,9 @@ public class CanvasController {
         mapData dataManager = (mapData) app.getDataComponent();
         mapWorkspace mapWorkspace = (mapWorkspace) app.getWorkspaceComponent();
         
+        if (dataManager.getTopNode(x, y) instanceof Line){
+            return;
+        }
         if (dataManager.isInState(SELECTING_STATIONS)){
             Node node = dataManager.selectTopNode(x, y);
             if (node instanceof MetroStation)
@@ -127,7 +107,7 @@ public class CanvasController {
             // SELECT THE TOP NODE
             Node node = dataManager.selectTopNode(x, y);
             Scene scene = app.getGUI().getPrimaryScene();
-
+            
             if (node instanceof MetroLine){
                 mapWorkspace.getLineColorPicker().setValue((Color)((MetroLine) node).getColor());
             }
@@ -144,10 +124,15 @@ public class CanvasController {
                 Label label1 = new Label("Line Name:");
                 TextField name = new TextField(((MetroLine) node).getAssociatedStartLabel().getText());
                 Label label2 = new Label("Line Color");
+                Region spacer = new Region();
+                HBox.setHgrow(spacer, Priority.ALWAYS);
+                Region spacer2 = new Region();
+                HBox.setHgrow(spacer2, Priority.ALWAYS);
 
-                nameHBox.getChildren().addAll(label1, name);
-                colorHBox.getChildren().addAll(label2, color);
+                nameHBox.getChildren().addAll(label1, spacer, name);
+                colorHBox.getChildren().addAll(label2, spacer2, color);
                 dialogVBox.getChildren().addAll(nameHBox, colorHBox);
+                dialogVBox.setSpacing(15);
                 dialog.getDialogPane().setContent(dialogVBox);
 
                 ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -166,6 +151,13 @@ public class CanvasController {
             else if (node != null) {
                 scene.setCursor(Cursor.MOVE);
                 dataManager.setState(mapState.DRAGGING_NODE);
+
+                // STORE CURRENT POSSITION FOR UNDO/REDO
+                if (node instanceof DraggableText){
+                    currentOldX = ((DraggableText) node).getX();
+                    currentOldY = ((DraggableText) node).getY();
+                }
+                
                 app.getGUI().updateToolbarControls(false);
             } else {
                 scene.setCursor(Cursor.DEFAULT);
@@ -192,31 +184,8 @@ public class CanvasController {
                 DraggableText label = (DraggableText) selectedNode;
                 selectedDraggableNode.drag(x, y);
             
-                if (label.getIsForLine()){
-                    if (label.getIsStartLabel()){
-                        label.getAssociatedLine().getPoints().set(0, label.getX());
-                        label.getAssociatedLine().getPoints().set(1, label.getY());
-                    }
-                    else{
-                        label.getAssociatedLine().getPoints().set(
-                                label.getAssociatedLine().getPoints().size() - 2, label.getX());
-                        label.getAssociatedLine().getPoints().set(
-                                label.getAssociatedLine().getPoints().size() - 1, label.getY());
-                    }
-                }
-                else if (label.getIsForStation()){
-                    label.getAssociatedStation().setCenterX(label.getX() - 15);
-                    label.getAssociatedStation().setCenterY(label.getY() + 10);
-                    if (!(label.getAssociatedStation().getLines().isEmpty())) {
-                        for (MetroLine m : label.getAssociatedStation().getLines()) {
-                            m.getPoints().set(m.getStationNames().indexOf(label.getText()) * 2 + 2, 
-                                    label.getAssociatedStation().getX() + label.getAssociatedStation().getRadius());
-                            m.getPoints().set(m.getStationNames().indexOf(label.getText()) * 2 + 3, 
-                                    label.getAssociatedStation().getY() + label.getAssociatedStation().getRadius());
-
-                        }
-                    }
-                }
+                LineStationAndLabelUpdater labelUpdater = new LineStationAndLabelUpdater();
+                labelUpdater.updateLabelAssociations(label);
             }
         }
     }
@@ -232,10 +201,40 @@ public class CanvasController {
             Scene scene = app.getGUI().getPrimaryScene();
             scene.setCursor(Cursor.DEFAULT);
             app.getGUI().updateToolbarControls(false);
+            
+            // NOW ADD MOVE NODE TRANSACTION
+            if (((mapData) app.getDataComponent()).getSelectedNode() instanceof DraggableText) {
+                jTPS jtps = app.getTPS();
+                DraggableText node = (DraggableText) ((mapData) app.getDataComponent()).getSelectedNode();
+                Move_Label_Transaction transaction = new Move_Label_Transaction(node, node.getX(), node.getY(), currentOldX, currentOldY);
+                jtps.addTransaction(transaction);
+            }
         } else if (dataManager.isInState(mapState.DRAGGING_NOTHING)) {
             dataManager.setState(SELECTING_NODE);
         }
     }
 
-
+    public void processZoomInRequest(Group zoomGroup){
+        zoomCounter = zoomCounter + 0.25;
+        zoomGroup.setScaleX(zoomCounter);
+        zoomGroup.setScaleY(zoomCounter);
+    }
+    
+    public void processZoomOutRequest(Group zoomGroup){
+        if (zoomCounter == 0.25)
+            return;
+        zoomCounter = zoomCounter - 0.25;        
+        zoomGroup.setScaleX(zoomCounter);
+        zoomGroup.setScaleY(zoomCounter);
+    }
+    
+    public void processIncreaseMapSizeRequest(Pane canvas){
+        canvas.setMaxSize(canvas.getWidth() * 1.25, canvas.getHeight() * 1.25);
+    }
+    
+    public void processDecreaseMapSizeRequest(Pane canvas){
+        if (canvas.getHeight() * 0.75 < canvas.getMinHeight() || canvas.getWidth() * 0.75 < canvas.getMinWidth())
+            return;
+        canvas.setMaxSize(canvas.getWidth() * 0.75, canvas.getHeight() * 0.75);
+    }
 }

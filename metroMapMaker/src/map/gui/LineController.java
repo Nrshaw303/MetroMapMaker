@@ -15,6 +15,8 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import map.data.MetroLine;
@@ -49,11 +51,16 @@ public class LineController {
         ColorPicker color = new ColorPicker();
         Label label1 = new Label("Line Name:");
         TextField name = new TextField();
-        Label label2 = new Label("Line Color");
+        Label label2 = new Label("Line Color: ");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Region spacer2 = new Region();
+        HBox.setHgrow(spacer2, Priority.ALWAYS);
         
-        nameHBox.getChildren().addAll(label1, name);
-        colorHBox.getChildren().addAll(label2, color);
+        nameHBox.getChildren().addAll(label1, spacer, name);
+        colorHBox.getChildren().addAll(label2, spacer2, color);
         dialogVBox.getChildren().addAll(nameHBox, colorHBox);
+        dialogVBox.setSpacing(15);
         dialog.getDialogPane().setContent(dialogVBox);
         
         ButtonType cancelButtonType = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
@@ -71,7 +78,18 @@ public class LineController {
     public void removeLine(){
         Node lineToRemove = mapManager.getSelectedNode();
         mapWorkspace = (mapWorkspace) app.getWorkspaceComponent();
+        mapManager = (mapData) app.getDataComponent();
+        
         if (lineToRemove instanceof MetroLine){
+            for (String station : ((MetroLine) lineToRemove).getStationNames()){
+                for (Node node : mapManager.getMapNodes()){
+                    if (node instanceof MetroStation){
+                        if (((MetroStation) node).getAssociatedLabel().equals(station)){
+                            ((MetroStation) node).removeLine((MetroLine) lineToRemove);
+                        }
+                    }
+                }
+            }
             mapWorkspace.removeLineFromList((MetroLine) lineToRemove);
             mapManager.removeNode(((MetroLine) lineToRemove).getAssociatedStartLabel());
             mapManager.removeNode(((MetroLine) lineToRemove).getAssociatedEndLabel());

@@ -1,0 +1,38 @@
+
+{
+    "lines":[
+        {
+            "name":"hey ;)",
+            "start_x":626.0,
+            "start_y":454.0,
+            "end_x":230.0,
+            "end_y":120.0,
+            "thickness":5.0,
+            "color":{
+                "red":0.501960813999176,
+                "green":0.501960813999176,
+                "blue":0.501960813999176,
+                "alpha":1.0
+            },
+            "station_names":[
+                "mudkip"
+            ]
+        }
+    ],
+    "stations":[
+        {
+            "name":"mudkip",
+            "x":368.0,
+            "y":324.0,
+            "radius":10.0,
+            "label_x":383.0,
+            "label_y":314.0,
+            "color":{
+                "red":1.0,
+                "green":1.0,
+                "blue":1.0,
+                "alpha":1.0
+            }
+        }
+    ]
+}

@@ -28,6 +28,7 @@ import djf.ui.AppDialogs;
 import static djf.ui.AppGUI.DISABLED;
 import static djf.ui.AppGUI.ENABLED;
 import djf.ui.FileController;
+import static java.lang.Double.MAX_VALUE;
 import static map.css.mapStyle.*;
 import map.data.Draggable;
 import static map.mapPropertyType.*;
@@ -39,6 +40,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
@@ -51,9 +53,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import static javafx.scene.paint.Color.rgb;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -153,11 +159,18 @@ public class mapWorkspace extends AppWorkspaceComponent {
     CheckBox showGridCheckBox;
     Region navigationSpacer;
     
+    // FOR NAVIGATION
+    Group zoomGroup;
+    Group canvasGroup;
+    ScrollPane scrollPane;
+    
+    BackgroundImage backgroundImage;
+    
     ObservableList<String> stationNames = FXCollections.observableArrayList();
-    ArrayList<MetroStation> listOfStations = new ArrayList<>();
+    ArrayList<MetroStation> listOfStations = new ArrayList();
     
     ObservableList<String> lineNames = FXCollections.observableArrayList();
-    ArrayList<MetroLine> listOfLines = new ArrayList<>();
+    ArrayList<MetroLine> listOfLines = new ArrayList();
     
     // THIS IS WHERE WE'LL RENDER OUR DRAWING, NOTE THAT WE
     // CALL THIS A CANVAS, BUT IT'S REALLY JUST A Pane
@@ -270,6 +283,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         stationsAsListButton = new Button();
         stationsAsListButton.setGraphic(new ImageView(new Image("file:images/list.png")));
         metroLinesComboBox = new ComboBox(lineNames);
+        metroLinesComboBox.setMaxWidth(100);
         metroLinesText = new Text("Metro Lines");
         metroLinesText.getStyleClass().add("labels");
         lineColorPicker = new ColorPicker();
@@ -302,6 +316,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         metroStationsText = new Text("Metro Stations");
         metroStationsText.getStyleClass().add("labels");
         metroStationsComboBox = new ComboBox(stationNames);
+        metroStationsComboBox.setMaxWidth(100);
         stationColorPicker = new ColorPicker();
         stationRadiusSlider = new Slider();
         stationSpacer = new Region();
@@ -316,8 +331,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
         locationPane = new VBox(5);
         routePane.setAlignment(Pos.CENTER);
         locationPane.setAlignment(Pos.CENTER);
-        startLocationComboBox = new ComboBox();
-        endLocationComboBox = new ComboBox();
+        startLocationComboBox = new ComboBox(stationNames);
+        endLocationComboBox = new ComboBox(stationNames);
         findRouteButton = new Button();
         findRouteButton.setGraphic(new ImageView(new Image("file:images/find_route.png")));
         locationPane.getChildren().addAll(startLocationComboBox, endLocationComboBox);
@@ -391,7 +406,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         navigationSpacer = new Region();
         HBox.setHgrow(navigationSpacer, Priority.ALWAYS);
         navigationTopPane.getChildren().addAll(navigationText, navigationSpacer, showGridCheckBox);
-        navigationBottomPane.getChildren().addAll(zoomInButton, zoomOutButton, increaseMapSizeButton, decreaseMapSizeButton);
+        navigationBottomPane.getChildren().addAll(zoomInButton, zoomOutButton, decreaseMapSizeButton, increaseMapSizeButton);
         navigationPane.getChildren().addAll(navigationTopPane, navigationBottomPane);
         editToolbar.getChildren().add(navigationPane);
 
@@ -410,12 +425,22 @@ public class mapWorkspace extends AppWorkspaceComponent {
 	
 	// AND MAKE SURE THE DATA MANAGER IS IN SYNCH WITH THE PANE
         mapData data = (mapData)app.getDataComponent();
-	data.setLogoNodes(canvas.getChildren());
+	data.setMapNodes(canvas.getChildren());
 
 	// AND NOW SETUP THE WORKSPACE
 	workspace = new BorderPane();
+        canvas.setMaxSize(700, 500);
+        canvas.setPrefSize(MAX_VALUE, MAX_VALUE);
+        canvas.setMinSize(140, 100);
 	((BorderPane)workspace).setLeft(editToolbar);
-	((BorderPane)workspace).setCenter(canvas);
+        zoomGroup = new Group(canvas);
+        canvasGroup = new Group(zoomGroup);
+        StackPane canvasPane = new StackPane(canvasGroup);
+        scrollPane = new ScrollPane(canvasPane);
+        scrollPane.setFitToHeight(ENABLED);
+        scrollPane.setFitToWidth(ENABLED);
+        scrollPane.setPannable(false);
+	((BorderPane)workspace).setCenter(scrollPane);
     }
     
     public ToggleButton initToggleButton(Pane parent, String name, boolean enabled) {
@@ -462,6 +487,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         StationController stationController = new StationController(app);
         CanvasController canvasController = new CanvasController(app);
         mapData mapManager = (mapData) app.getDataComponent();
+        AddImageController imageController = new AddImageController(app);
         
 	app.getGUI().getWindow().setOnCloseRequest(i ->{
             ButtonType sellection = AppDialogs.showYesNoCancelDialog(app.getGUI().getWindow(), SAVE_VERIFY_TITLE, SAVE_VERIFY_CONTENT);
@@ -512,6 +538,67 @@ public class mapWorkspace extends AppWorkspaceComponent {
         removeStationButton.setOnAction(i -> {
             stationController.removeStation();
         });
+        snapToGridButton.setOnAction(i ->{
+            stationController.snapToGrid(mapManager.getSelectedNode());
+        });
+        moveLabelButton.setOnAction(i -> {
+            stationController.moveLabel(mapManager.getSelectedNode());
+        });
+        zoomInButton.setOnAction(i ->{
+            canvasController.processZoomInRequest(zoomGroup);
+        });
+        zoomOutButton.setOnAction(i ->{
+            canvasController.processZoomOutRequest(zoomGroup);
+        });
+        increaseMapSizeButton.setOnAction(i ->{
+            canvasController.processIncreaseMapSizeRequest(canvas);
+            mapManager.updateGridLines();
+        });
+        decreaseMapSizeButton.setOnAction(i ->{
+            canvasController.processDecreaseMapSizeRequest(canvas);
+            mapManager.updateGridLines();
+        });
+        showGridCheckBox.setOnAction(i ->{
+            if (showGridCheckBox.isSelected()){
+                mapManager.showGridLines();
+            }
+            else
+                mapManager.hideGridLines();
+        });
+        findRouteButton.setOnAction(i ->{
+            if (startLocationComboBox.getSelectionModel().getSelectedItem() == null 
+                    || endLocationComboBox.getSelectionModel().getSelectedItem() == null){
+                i.consume();
+            }
+            else{
+                MetroStation startStation = null;
+                MetroStation endStation = null;
+                for (MetroStation station : listOfStations){
+                    if (station.getAssociatedLabel().getText() == startLocationComboBox.getValue()){
+                        startStation = station;
+                    }
+                }
+                for (MetroStation station : listOfStations){
+                    if (station.getAssociatedLabel().getText() == endLocationComboBox.getValue()){
+                        endStation = station;
+                    }
+                }
+                ArrayList<MetroStation> solution = stationController.findRoute(startStation, endStation);
+                if (!solution.isEmpty()){
+                    for (MetroStation station : solution){
+                        System.out.println(station.getAssociatedLabel().getText());
+                    }
+                }
+            }
+        });
+        setImageBackgroundButton.setOnAction(i ->{
+            backgroundImage = new BackgroundImage(imageController.promptForImage(), null, null, null, 
+                    new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false));
+            canvas.setBackground(new Background(backgroundImage));
+        });
+        addImageButton.setOnAction(i ->{
+            imageController.processAddImage();
+        });
 	canvas.setOnMousePressed(e->{
 	    canvasController.processCanvasMousePress((int)e.getX(), (int)e.getY(), e.getClickCount());
 	});
@@ -521,6 +608,10 @@ public class mapWorkspace extends AppWorkspaceComponent {
 	canvas.setOnMouseDragged(e->{            
 	    canvasController.processCanvasMouseDragged((int)e.getX(), (int)e.getY());
 	});
+        app.getGUI().getExportButton().setOnAction(i -> {
+            SnapshotController snapshotController = new SnapshotController(app);
+            snapshotController.processSnapshot(app.getGUI().getFileController().processExportRequest());
+        });
         
 //        // THEN THE ADD IMAGE AND TEXT TOOLBAR
 //        AddImageAndTextController addImageAndTextController = new AddImageAndTextController(app);
@@ -732,5 +823,13 @@ public class mapWorkspace extends AppWorkspaceComponent {
     
     public ObservableList<String> getListOfLineNames(){
         return lineNames;
+    }
+    
+    public SnapshotController getSnapshotController(){
+        return new SnapshotController(app);
+    }
+    
+    public ScrollPane getCanvasScrollPane(){
+        return scrollPane;
     }
 }

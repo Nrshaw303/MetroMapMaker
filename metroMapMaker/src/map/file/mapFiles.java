@@ -179,11 +179,11 @@ public class mapFiles implements AppFileComponent {
 	jsonWriter.close();
 
 	// INIT THE WRITER
-	OutputStream os = new FileOutputStream(filePath);
+	OutputStream os = new FileOutputStream(filePath + ".json");
 	JsonWriter jsonFileWriter = Json.createWriter(os);
 	jsonFileWriter.writeObject(dataManagerJSO);
 	String prettyPrinted = sw.toString();
-	PrintWriter pw = new PrintWriter(filePath);
+	PrintWriter pw = new PrintWriter(filePath + ".json");
 	pw.write(prettyPrinted);
 	pw.close();
     }

@@ -15,12 +15,13 @@ import javafx.scene.shape.Shape;
 import map.gui.mapWorkspace;
 import djf.components.AppDataComponent;
 import djf.AppTemplate;
+import javafx.collections.FXCollections;
 import static javafx.scene.paint.Color.rgb;
+import javafx.scene.shape.Line;
 import static map.data.mapState.*;
 import javafx.scene.text.Text;
 import jtps.jTPS;
 import static map.data.Draggable.LINE;
-import map.gui.LayerController;
 import map.transactions.AddNode_Transaction;
 
 /**
@@ -33,8 +34,10 @@ import map.transactions.AddNode_Transaction;
 public class mapData implements AppDataComponent {
     // FIRST THE THINGS THAT HAVE TO BE SAVED TO FILES
     
-    // THESE ARE THE NODES IN THE LOGO
+    // THESE ARE THE NODES IN THE MAP
     ObservableList<Node> mapNodes;
+    ObservableList<Line> gridLines;
+    Boolean hasGridLines = false;
         
     // THIS IS THE SHAPE CURRENTLY BEING SIZED BUT NOT YET ADDED
     Shape newShape;
@@ -86,7 +89,7 @@ public class mapData implements AppDataComponent {
 	return mapNodes;
     }
     
-    public void setLogoNodes(ObservableList<Node> initLogoNodes) {
+    public void setMapNodes(ObservableList<Node> initLogoNodes) {
 	mapNodes = initLogoNodes;
     }
     
@@ -151,7 +154,9 @@ public class mapData implements AppDataComponent {
         newShape = label;
         initNewShape();
         
-	MetroStation newStation = new MetroStation(label.getX() - 15, label.getY() + 10, 10);
+	MetroStation newStation = new MetroStation(label.getX(), label.getY(), 10);
+        label.setX(label.getX() + 15);
+        label.setY(label.getY() + label.getHeight() / 2);
         newStation.setFill(rgb(255,255,255));
         newStation.setStroke(rgb(0,0,0));
         newStation.setAssociatedLabel(label);
@@ -164,7 +169,6 @@ public class mapData implements AppDataComponent {
     }
     
     public void startNewLine(int x1, int y1, int x2, int y2, String name, Color color){
-        LayerController layerController = new LayerController(app);
         DraggableText start = new DraggableText(name);
         start.setIsForLine(true);
         start.setIsStart(true);
@@ -280,51 +284,6 @@ public class mapData implements AppDataComponent {
 	return state == testState;
     }
     
-    // METHODS NEEDED BY TRANSACTIONS
-    
-    public void moveNodeToFront(Node nodeToMove) {
-        int currentIndex = mapNodes.indexOf(nodeToMove);
-        if (currentIndex >= 0) {
-            mapNodes.remove(currentIndex);
-	    if (mapNodes.isEmpty()) {
-		mapNodes.add(nodeToMove);
-	    }
-	    else {
-		ArrayList<Node> temp = new ArrayList();
-		temp.add(nodeToMove);
-		for (Node node : mapNodes)
-		    temp.add(node);
-		mapNodes.clear();
-		for (Node node : temp)
-                    mapNodes.add(node);
-	    }            
-        }
-    }
-    
-    public void moveNodeToBack(Node nodeToMove) {
-        int currentIndex = mapNodes.indexOf(nodeToMove);
-        if (currentIndex >= 0) {
-	    mapNodes.remove(currentIndex);
-	    mapNodes.add(nodeToMove);
-        }
-    }
-    
-    public void moveNodeToIndex(Node nodeToMove, int index) {
-        int currentIndex = mapNodes.indexOf(nodeToMove);
-        int numberOfNodes = mapNodes.size();
-        if ((currentIndex >= 0) && (index >= 0) && (index < numberOfNodes)) {
-            // IS IT SUPPOSED TO BE THE LAST ONE?
-            if (index == (numberOfNodes-1)) {
-                mapNodes.remove(currentIndex);
-                mapNodes.add(nodeToMove);
-            }
-            else {
-                mapNodes.remove(currentIndex);
-                mapNodes.add(index, nodeToMove);
-            }
-        }
-    }
-    
     public void removeNode(Node nodeToRemove) {
         int currentIndex = mapNodes.indexOf(nodeToRemove);
         if (currentIndex >= 0) {
@@ -358,4 +317,33 @@ public class mapData implements AppDataComponent {
         else
             return (selectedNode instanceof Text);
     }
+    
+    public void showGridLines(){
+        gridLines = FXCollections.observableArrayList();
+        Pane canvas = ((mapWorkspace) app.getWorkspaceComponent()).getCanvas();
+        for (int i = 30; i < canvas.getMaxHeight(); i = i + 30){
+            Line line = new Line(0, i, canvas.getMaxWidth(), i);
+            gridLines.add(line);
+        }
+        for (int i = 30; i < canvas.getMaxWidth(); i = i + 30){
+            Line line = new Line(i, 0, i, canvas.getMaxHeight());
+            gridLines.add(line);
+        }
+        mapNodes.addAll(0, gridLines);
+        hasGridLines = true;
+    }
+    
+    public void hideGridLines(){
+        if (hasGridLines){
+            mapNodes.removeAll(gridLines);
+        }
+    }
+    
+    public void updateGridLines(){
+        if (hasGridLines){
+            hideGridLines();
+            showGridLines();
+        }
+    }
+    
 }
