@@ -11,7 +11,10 @@ import djf.AppTemplate;
 import static java.lang.Double.MAX_VALUE;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Queue;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -171,7 +174,6 @@ public class StationController {
     public ArrayList<MetroStation> findRoute(MetroStation startStation, MetroStation endStation){
         
         ArrayList<MetroStation> stations = ((mapWorkspace) app.getWorkspaceComponent()).getListOfStations();
-        ArrayList<MetroStation> solution = new ArrayList();
         int[][] adjMatrix = new int[stations.size()][stations.size()];
         int[][] solMatrix = new int[stations.size()][stations.size()];
         for (int i = 0; i < stations.size(); i++){
@@ -215,68 +217,43 @@ public class StationController {
         for (int i = 0; i < stations.size(); i++){
             solMatrix[i][i] = 0;
         }
-//        System.out.println("Solution Matrix");
-//        System.out.print("[ ] ");
-//        for (int i = 0; i < stations.size(); i++){
-//            System.out.print("[" + stations.get(i).getAssociatedLabel().getText() + "] ");
-//        }
-//        System.out.println();
-//        for (int i = 0; i < stations.size(); i++){
-//            System.out.print("[" + stations.get(i).getAssociatedLabel().getText() + "] ");
-//            for (int j = 0; j < stations.size(); j++){
-//                System.out.print("[" + solMatrix[i][j] + "] ");
-//            }
-//            System.out.println();
-//        }
-        ArrayList<ArrayList<MetroStation>> possibleSolutions = new ArrayList<>();
-        int startIndex = stations.indexOf(startStation);
-        int endIndex = stations.indexOf(endStation);
-        if (solMatrix[startIndex][endIndex] == 1) {
-            solution.add(startStation);
-            solution.add(endStation);
-            return solution;
-        } 
-        else if (solMatrix[startIndex][endIndex] < 10000) {
-            for (int i = 0; i < stations.size(); i++) {
-                solution = new ArrayList();
-                solution.add(startStation);
-                solution.add(stations.get(i));
-                ArrayList<MetroStation> possible = traceShortest(solution, solMatrix, startIndex, endStation, endIndex, stations);
-                if (possible != null){
-                    possibleSolutions.add(possible);
-                }
-            }
-        } 
-        for (ArrayList<MetroStation> list : possibleSolutions){
-            if (list.size() < solution.size())
-                solution = list;
+        int[] visited = new int[stations.size()];
+        for (int i = 0; i < visited.length; i++){
+            visited[i] = -1;
         }
-        return solution;
-        
+        int start = stations.indexOf(startStation);
+        int end = stations.indexOf(endStation);
+        if (solMatrix[start][end] == 0)
+            return new ArrayList();
+        return BFS(adjMatrix, start, end, stations, visited);
     }
-
-    public ArrayList<MetroStation> traceShortest(ArrayList<MetroStation> solution, int[][] solMatrix, 
-            int index, MetroStation endStation, int endIndex, ArrayList<MetroStation> stations) {
-        if (solution.size() > 0) {
-            if (solution.get(solution.size() - 1) == endStation) {
-                return solution;
+    
+    public ArrayList<MetroStation> BFS(int[][] adj, int start, int end, ArrayList<MetroStation> stations, int[] visited){
+        visited[start] = 100;
+        ArrayList<Integer> arr = new ArrayList();
+        ArrayList<MetroStation> solution = new ArrayList();
+        arr.add(start);
+        while (!arr.isEmpty()){
+            int e = arr.get(arr.size() - 1);
+            if (arr.contains(end)){
+                break;
             }
-        }
-        else{
-            if (solMatrix[index][endIndex] < 10000){
-                return null;
-            }
-            else{
-                for (int i = 0; i < solMatrix[index].length; i++){
-                    solution.add(stations.get(i));
-                    ArrayList<MetroStation> possibleSolution = traceShortest(solution, solMatrix, i, endStation, endIndex, stations);
-                    if (possibleSolution.get(possibleSolution.size() - 1) == endStation){
-                        return possibleSolution;
-                    }
+            int temp = 0;
+            while (temp < stations.size()){
+                if ((visited[temp] == -1)  && (adj[e][temp] == 1)){
+                    arr.add(temp);
+                    visited[temp] = e;
                 }
+                temp++;
             }
         }
-        return null;
+        int i = end;
+        while(i != 100){
+            solution.add(stations.get(i));
+            i = visited[i];
+        }
+        Collections.reverse(solution);
+        return solution;
     }
     
     public void addLabel(){
