@@ -19,6 +19,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import static javafx.scene.paint.Color.BLACK;
 import map.data.MetroLine;
 import map.data.MetroStation;
 import map.data.mapData;
@@ -48,7 +49,7 @@ public class LineController {
         HBox nameHBox = new HBox();
         HBox colorHBox = new HBox();
         
-        ColorPicker color = new ColorPicker();
+        ColorPicker color = new ColorPicker(BLACK);
         Label label1 = new Label("Line Name:");
         TextField name = new TextField();
         Label label2 = new Label("Line Color: ");
