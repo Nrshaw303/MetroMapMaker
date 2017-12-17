@@ -60,6 +60,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.rgb;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
@@ -324,7 +325,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         metroStationsText.getStyleClass().add("labels");
         metroStationsComboBox = new ComboBox(stationNames);
         metroStationsComboBox.setMaxWidth(100);
-        stationColorPicker = new ColorPicker();
+        stationColorPicker = new ColorPicker(BLACK);
         stationRadiusSlider = new Slider();
         stationSpacer = new Region();
         HBox.setHgrow(stationSpacer, Priority.ALWAYS);
@@ -361,7 +362,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         removeElementButton = new Button("Remove\nElement");
         decoreText = new Text("Decore");
         decoreText.getStyleClass().add("labels");
-        decoreColorPicker = new ColorPicker();
+        decoreColorPicker = new ColorPicker(BLACK);
         decoreSpacer = new Region();
         HBox.setHgrow(decoreSpacer, Priority.ALWAYS);
         decoreTopPane.getChildren().addAll(decoreText, decoreSpacer, decoreColorPicker);
@@ -384,7 +385,7 @@ public class mapWorkspace extends AppWorkspaceComponent {
         fontSizeComboBox = initComboBox(FONT_SIZE_COMBO_BOX_OPTIONS.toString());
         fontText = new Text("Font");
         fontText.getStyleClass().add("labels");
-        fontColorColorPicker = new ColorPicker();
+        fontColorColorPicker = new ColorPicker(BLACK);
         fontSpacer = new Region();
         HBox.setHgrow(fontSpacer, Priority.ALWAYS);
         fontTopPane.getChildren().addAll(fontText, fontSpacer, fontColorColorPicker);
@@ -572,8 +573,10 @@ public class mapWorkspace extends AppWorkspaceComponent {
                 i.consume();
             }
             else{
-                MetroLine line = listOfLines.get(metroLinesComboBox.getSelectionModel().getSelectedIndex());
-                line.getListOfStationsDialog();
+                if (!metroLinesComboBox.getSelectionModel().isEmpty()){
+                    MetroLine line = listOfLines.get(metroLinesComboBox.getSelectionModel().getSelectedIndex());
+                    line.getListOfStationsDialog();
+                }
             }
         });
         stationColorPicker.setOnAction(i ->{
@@ -586,7 +589,8 @@ public class mapWorkspace extends AppWorkspaceComponent {
             }
         });
         metroLinesComboBox.setOnAction(i ->{
-            mapManager.setSelectedNode(listOfLines.get(metroLinesComboBox.getSelectionModel().getSelectedIndex()));
+            if (!metroLinesComboBox.getSelectionModel().isEmpty())
+                mapManager.setSelectedNode(listOfLines.get(metroLinesComboBox.getSelectionModel().getSelectedIndex()));
         });
         removeStationButton.setOnAction(i -> {
             stationController.removeStation();
@@ -695,8 +699,13 @@ public class mapWorkspace extends AppWorkspaceComponent {
                 
                 String sol = "";
                 
-                for (int j = 0; j < solution.size(); j++){
-                    sol += "• " + solution.get(j).getAssociatedLabel().getText() + "\n";
+                if (solution.isEmpty()){
+                    sol += "No Possible Route";
+                }
+                else{
+                    for (int j = 0; j < solution.size(); j++){
+                        sol += "• " + solution.get(j).getAssociatedLabel().getText() + "\n";
+                    }
                 }
                 
                 VBox dialogVBox = new VBox(new Text(sol));
