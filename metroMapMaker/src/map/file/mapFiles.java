@@ -133,7 +133,7 @@ public class mapFiles implements AppFileComponent {
                         .add(JSON_NAME, name)
                         .add(JSON_START_X, startX)
                         .add(JSON_START_Y, startY)
-                        .add(JSON_CIRCULAR, 0)
+                        .add(JSON_CIRCULAR, false)
                         .add(JSON_END_X, endX)
                         .add(JSON_END_Y, endY)
                         .add(JSON_THICKNESS, width)
