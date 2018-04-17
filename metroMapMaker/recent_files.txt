@@ -1,5 +1,3 @@
-work//lines_and_stations
-work//Bob.pose
-work//Junk.pm
-work//MyEllipses.pm
-work//Test.pm
+work//hey.json
+work//hello.json
+C://Users//Nick//Documents//NetBeansProjects//hw6//hw6//metroMapMaker//metroMapMaker//work//background.json

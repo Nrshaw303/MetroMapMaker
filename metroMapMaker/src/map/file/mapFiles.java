@@ -1,5 +1,7 @@
 package map.file;
 
+import static djf.AppPropertyType.LOAD_ERROR_CONTENT;
+import static djf.AppPropertyType.LOAD_ERROR_TITLE;
 import djf.AppTemplate;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,7 +28,16 @@ import javax.json.JsonWriterFactory;
 import javax.json.stream.JsonGenerator;
 import djf.components.AppDataComponent;
 import djf.components.AppFileComponent;
+import djf.ui.AppDialogs;
+import static djf.welcome.AppWelcomeDialog.LOAD_MAP_REQUEST;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import static javafx.scene.paint.Color.rgb;
 import map.data.mapData;
@@ -188,6 +199,19 @@ public class mapFiles implements AppFileComponent {
 	PrintWriter pw = new PrintWriter(filePath + ".json");
 	pw.write(prettyPrinted);
 	pw.close();
+        
+        // NOW WE UPDATE THE RECENT FILES MENU IN WELCOME
+        File recents = new File("recent_files.txt");
+        FileWriter fileWriter = new FileWriter(recents, true);
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        String line = null;
+        String[] recentFiles = new String[100];
+        String newFilePath = filePath.replace("\\", "//");
+
+        bufferedWriter.newLine();
+        bufferedWriter.write(newFilePath + ".json");
+        bufferedWriter.close();
+        fileWriter.close();
     }
     
     private JsonObject makeJsonColorObject(Color color) {

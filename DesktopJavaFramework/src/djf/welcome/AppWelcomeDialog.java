@@ -160,8 +160,9 @@ public class AppWelcomeDialog implements AppWelcomeComponent{
             fileReader = new FileReader(recents);
             bufferedReader = new BufferedReader(fileReader);
             String line = null;
+            int i = 0;
             
-            while ((line = bufferedReader.readLine()) != null){
+            while ((line = bufferedReader.readLine()) != null && i < 6){
                 File file = new File(line);
                 if (file.exists()){
                     String[] lineArray = line.split("//");
@@ -173,8 +174,11 @@ public class AppWelcomeDialog implements AppWelcomeComponent{
                         welcomeStage.close();
                     });
                     menu.getChildren().add(recentFileButton);
+                    i++;
                 }
             }
+            fileReader.close();
+            bufferedReader.close();
         }catch(Exception e){
             AppDialogs.showMessageDialog(app.getGUI().getWindow(), LOAD_ERROR_TITLE, LOAD_ERROR_CONTENT);
         }
